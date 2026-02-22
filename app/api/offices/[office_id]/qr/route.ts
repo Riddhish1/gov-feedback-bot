@@ -11,12 +11,15 @@ import Office from "@/models/Office";
  * Format:  https://wa.me/<number>?text=<office_id>
  * Number:  strip "whatsapp:+" prefix from TWILIO_WHATSAPP_NUMBER
  */
-function buildWhatsAppLink(officeId: string): string {
+function buildWhatsAppLink(officeName: string, officeId: string): string {
   const raw = process.env.TWILIO_WHATSAPP_NUMBER ?? "";
   // "whatsapp:+14155238886" → "14155238886"
   const number = raw.replace(/^whatsapp:\+?/i, "").trim();
-  // Pre-fill just the office ID — clean and minimal
-  const text = encodeURIComponent(officeId);
+
+  // Visible message as requested: include office name and id in parentheses
+  const visible = `I want to give feedback for my visit to ${officeName} (${officeId})`;
+
+  const text = encodeURIComponent(visible);
   return `https://wa.me/${number}?text=${text}`;
 }
 
@@ -60,7 +63,7 @@ export async function GET(
       );
     }
 
-    const waLink = buildWhatsAppLink(office_id);
+    const waLink = buildWhatsAppLink(office.office_name, office_id);
 
     if (format === "svg") {
       const svg = await QRCode.toString(waLink, {

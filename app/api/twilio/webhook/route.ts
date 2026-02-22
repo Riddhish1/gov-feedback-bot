@@ -83,6 +83,15 @@ export async function POST(request: NextRequest): Promise<Response> {
     // 4. Connect to MongoDB
     await connectDB();
 
+    // ── Handle visible QR sentence like:
+    // "I want to give feedback for my visit to {office_name} ({office_id})"
+    const visibleRegex = /^I want to give feedback for my visit to\s+(.+?)\s*\(([^)]+)\)\s*$/i;
+    const visibleMatch = messageText.match(visibleRegex);
+    if (visibleMatch) {
+      const officeId = visibleMatch[2].trim();
+      return startSession(officeId);
+    }
+
     // ── Helper: start a new session for a given officeId ───────────────────
     async function startSession(officeId: string): Promise<Response> {
       const office = await Office.findOne({ office_id: officeId }).lean();
