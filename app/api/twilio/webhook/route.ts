@@ -3,6 +3,7 @@ import twilio from "twilio";
 
 import { connectDB } from "@/lib/db";
 import { QUESTIONS } from "@/lib/questions";
+import { handleOfficeFlow, handlePolicyFlow, handleProcessFlow } from "@/lib/flowHandlers";
 import Office from "@/models/Office";
 import Session from "@/models/Session";
 
@@ -111,16 +112,12 @@ export async function POST(request: NextRequest): Promise<Response> {
         office_id: officeId,
         office_name: office.office_name,
         current_step: 1,
+        flow_type: null,
         completed: false,
-        answers: {
-          rating: null,
-          feedback: null,
-          scheme_suggestion: null,
-          policy_suggestion: null,
-        },
+        answers: {},
       });
 
-      return twimlResponse(QUESTIONS.Q1(office.office_name));
+      return twimlResponse(QUESTIONS.WELCOME(office.office_name));
     }
 
     // ── Handle START_OFFICE_<id>  (legacy / fallback trigger) ────────────────
@@ -165,56 +162,51 @@ export async function POST(request: NextRequest): Promise<Response> {
 
     // ── Conversation state machine ─────────────────────────────────────────────
     switch (session.current_step) {
-      // ── Step 1: Collect rating (1–5) ────────────────────────────────────────
+      // ── Step 1: Flow Selection ──────────────────────────────────────────────
       case 1: {
-        const rating = parseInt(messageText, 10);
+        const choice = messageText.trim();
 
-        if (isNaN(rating) || rating < 1 || rating > 5 || String(rating) !== messageText) {
-          // Not a clean integer 1-5 — re-ask
-          return twimlResponse(QUESTIONS.INVALID_RATING);
+        if (choice === "1") {
+          session.flow_type = "office";
+          session.current_step = 2;
+          await session.save();
+          return twimlResponse(QUESTIONS.OFFICE_RATING);
+        } else if (choice === "2") {
+          session.flow_type = "policy";
+          session.current_step = 2;
+          await session.save();
+          return twimlResponse(QUESTIONS.POLICY_NAME);
+        } else if (choice === "3") {
+          session.flow_type = "process";
+          session.current_step = 2;
+          await session.save();
+          return twimlResponse(QUESTIONS.PROCESS_NAME);
+        } else {
+          return twimlResponse(QUESTIONS.INVALID_FLOW_SELECTION);
         }
-
-        session.answers.rating = rating;
-        session.current_step = 2;
-        await session.save();
-
-        return twimlResponse(QUESTIONS.Q2);
       }
 
-      // ── Step 2: Collect general feedback ────────────────────────────────────
-      case 2: {
-        if (!messageText) {
-          return twimlResponse(
-            "⚠️ Please type your feedback before sending."
-          );
-        }
-
-        session.answers.feedback = messageText;
-        session.current_step = 3;
-        await session.save();
-
-        return twimlResponse(QUESTIONS.Q3);
-      }
-
-      // ── Step 3: Collect scheme suggestion (skippable) ────────────────────────
-      case 3: {
-        session.answers.scheme_suggestion =
-          messageText.toLowerCase() === "skip" ? "" : messageText;
-        session.current_step = 4;
-        await session.save();
-
-        return twimlResponse(QUESTIONS.Q4);
-      }
-
-      // ── Step 4: Collect policy suggestion (skippable) ────────────────────────
+      // ── Steps 2-4: Flow-specific handling ────────────────────────────────────
+      case 2:
+      case 3:
       case 4: {
-        session.answers.policy_suggestion =
-          messageText.toLowerCase() === "skip" ? "" : messageText;
-        session.current_step = 5;
-        session.completed = true;
+        let result;
+
+        if (session.flow_type === "office") {
+          result = await handleOfficeFlow(session, messageText);
+        } else if (session.flow_type === "policy") {
+          result = await handlePolicyFlow(session, messageText);
+        } else if (session.flow_type === "process") {
+          result = await handleProcessFlow(session, messageText);
+        } else {
+          return twimlResponse(QUESTIONS.ERROR);
+        }
+
+        session.current_step = result.nextStep;
+        session.completed = result.completed;
         await session.save();
 
-        return twimlResponse(QUESTIONS.FINAL);
+        return twimlResponse(result.message);
       }
 
       // ── Step 5: Session already complete ────────────────────────────────────
