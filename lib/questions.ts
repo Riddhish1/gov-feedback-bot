@@ -7,91 +7,94 @@
  */
 
 export const QUESTIONS = {
-  /**
-   * Q1: Displayed after a citizen starts the session with START_OFFICE_<id>
-   * Asks for a numeric rating 1–5.
-   */
-  Q1: (officeName: string): string =>
-    `Thank you for visiting ${officeName}. 🙏\n\nPlease rate your visit experience:\n\n1️⃣ Poor\n2️⃣ Fair\n3️⃣ OK\n4️⃣ Good\n5️⃣ Excellent\n\nReply with a number from 1 to 5.`,
+  GREETING: (officeName: string): string =>
+    `Welcome to Maharashtra Citizen Governance Feedback System\n\nThis is not a complaint portal.\nYour feedback helps improve government services.\n\nIt takes less than 30 seconds.\n\nPlease select an option:\n\n1️⃣ Office Experience\n2️⃣ Policy Suggestion\n3️⃣ Process Reform Suggestion\n\nReply with 1, 2, or 3.`,
 
-  /**
-   * Q2: Asks for general feedback about the visit.
-   */
-  Q2: "Any feedback about your visit today? 📝\n\nYou can mention:\n• Staff behaviour\n• Waiting time / delays\n• Facilities\n• Overall experience\n\nPlease type your response:",
+  OFFICE_Q1:
+    `How was your experience at this office today?\n\n1 ⭐ Very Poor\n2 ⭐ Poor\n3 ⭐ Average\n4 ⭐ Good\n5 ⭐ Excellent\n\nReply with 1–5.`,
 
-  /**
-   * Q3: Asks for suggestions about government schemes.
-   */
-  Q3: "Any suggestions about government schemes? 💡\n\nYou may suggest:\n• Improvements to existing schemes\n• New schemes that would help citizens\n\nPlease type your suggestion (or reply *skip* to skip):",
+  OFFICE_ISSUE:
+    `What was the main issue?\n\n1️⃣ Long waiting time\n2️⃣ Staff behaviour\n3️⃣ Too many documents asked\n4️⃣ Lack of clarity in process\n5️⃣ Multiple visits required\n6️⃣ Other (type briefly)\n\nReply with option number.`,
 
-  /**
-   * Q4: Asks for policy improvement suggestions.
-   */
-  Q4: "Any suggestions to improve government policies or services? 🏛️\n\nYour input helps shape better governance.\n\nPlease type your suggestion (or reply *skip* to skip):",
+  OFFICE_POSITIVE:
+    `What went well? (Optional)\n\n1️⃣ Quick service\n2️⃣ Helpful staff\n3️⃣ Clear process\n4️⃣ Digital system worked well\n5️⃣ Other (type briefly)\n\nReply with option number or type your response.`,
 
-  /**
-   * FINAL: Sent after all questions are answered (step 5).
-   */
-  FINAL:
-    "✅ Thank you! Your feedback has been recorded.\n\nYour responses help the government improve public services for all citizens.\n\nHave a great day! 🇮🇳",
+  FINAL_OFFICE:
+    `Thank you for your feedback.\nYour submission has been recorded.`,
 
-  /**
-   * INVALID_RATING: Sent when a citizen provides an invalid rating at step 1.
-   */
-  INVALID_RATING:
-    "⚠️ Please reply with a number between *1* and *5* to rate your experience.\n\n1️⃣ Poor  |  2️⃣ Fair  |  3️⃣ OK  |  4️⃣ Good  |  5️⃣ Excellent",
+  POLICY_Q1:
+    `Which policy or scheme would you like to suggest improvement for?\n(Type name or describe briefly)`,
 
-  /**
-   * OFFICE_NOT_FOUND: Sent when the office_id is not found in the database.
-   */
-  OFFICE_NOT_FOUND: (officeId: string): string =>
-    `⚠️ Office with ID *${officeId}* was not found in the system.\n\nPlease scan the correct QR code or contact the office staff.`,
+  POLICY_IMPROVEMENT:
+    `What kind of improvement do you suggest?\n\n1️⃣ Change eligibility criteria\n2️⃣ Increase benefit amount\n3️⃣ Simplify conditions\n4️⃣ Add new beneficiary category\n5️⃣ Improve awareness\n6️⃣ Other (type)\n\nReply with option number.`,
 
-  /**
-   * SESSION_COMPLETED: Sent when a citizen tries to interact after completing feedback.
-   */
-  SESSION_COMPLETED:
-    "✅ You have already submitted your feedback. Thank you!\n\nIf you wish to submit feedback for another office, please scan a new QR code.",
+  POLICY_BENEFICIARY:
+    `Who will benefit from this change?\n\n1️⃣ Farmers\n2️⃣ Students\n3️⃣ Women\n4️⃣ Senior citizens\n5️⃣ Entrepreneurs\n6️⃣ General public\n7️⃣ Other\n\nReply with option number.`,
 
-  /**
-   * ERROR: Generic error message.
-   */
-  ERROR:
-    "⚠️ Something went wrong on our end. Please try again or scan the QR code to restart.",
-  INVALID_OPTION: "⚠️ Invalid option selected.",
-  OFFICE_ISSUE: "Please select an issue type.",
-  OFFICE_POSITIVE: "Please select what you liked.",
-  FINAL_OFFICE: "Thank you for your office feedback.",
-  POLICY_IMPROVEMENT: "What kind of improvement?",
-  POLICY_BENEFICIARY: "Who is the primary beneficiary?",
-  FINAL_POLICY: "Thank you for your policy feedback.",
-  PROCESS_DIFFICULTY: "What was the difficulty?",
-  PROCESS_SUGGESTION: "What is your suggestion?",
-  FINAL_PROCESS: "Thank you for your process feedback.",
+  FINAL_POLICY:
+    `Thank you for your policy suggestion.\nIt will be reviewed for reform consideration.`,
+
+  PROCESS_Q1:
+    `Which service or process needs simplification?\n(Example: Certificate, License, Land record, Scheme approval)`,
+
+  PROCESS_DIFFICULTY:
+    `What is the main difficulty?\n\n1️⃣ Too many documents\n2️⃣ Too many approval levels\n3️⃣ Delay in processing\n4️⃣ Need to visit multiple offices\n5️⃣ Lack of online option\n6️⃣ Repetitive verification\n7️⃣ Other\n\nReply with option number.`,
+
+  PROCESS_SUGGESTION:
+    `What should be simplified? (One line suggestion)`,
+
+  FINAL_PROCESS:
+    `Thank you for your suggestion.\nIf similar inputs are received across offices, a process improvement review will be initiated.`,
+
+  INVALID_OPTION: "⚠️ Invalid option selected. Please reply with the correct number.",
+  INVALID_RATING: "⚠️ Please reply with a number between 1 and 5.",
+  OFFICE_NOT_FOUND: (officeId: string): string => `⚠️ Office with ID *${officeId}* was not found in the system.`,
+  SESSION_COMPLETED: "✅ You have already submitted your feedback. Thank you!",
+  ERROR: "⚠️ Something went wrong on our end. Please try again or scan the QR code to restart.",
 } as const;
 
 export const OFFICE_ISSUES: Record<string, string> = {
-  "1": "Delay",
-  "2": "Bribery",
-  "3": "Staff Behavior",
+  "1": "Long waiting time",
+  "2": "Staff behaviour",
+  "3": "Too many documents asked",
+  "4": "Lack of clarity in process",
+  "5": "Multiple visits required",
+  "6": "Other",
 };
 
 export const OFFICE_POSITIVES: Record<string, string> = {
-  "1": "Fast Service",
-  "2": "Helpful Staff",
+  "1": "Quick service",
+  "2": "Helpful staff",
+  "3": "Clear process",
+  "4": "Digital system worked well",
+  "5": "Other",
 };
 
 export const POLICY_IMPROVEMENTS: Record<string, string> = {
-  "1": "Change rule",
-  "2": "Better funding",
+  "1": "Change eligibility criteria",
+  "2": "Increase benefit amount",
+  "3": "Simplify conditions",
+  "4": "Add new beneficiary category",
+  "5": "Improve awareness",
+  "6": "Other",
 };
 
 export const POLICY_BENEFICIARIES: Record<string, string> = {
   "1": "Farmers",
   "2": "Students",
+  "3": "Women",
+  "4": "Senior citizens",
+  "5": "Entrepreneurs",
+  "6": "General public",
+  "7": "Other",
 };
 
 export const PROCESS_DIFFICULTIES: Record<string, string> = {
-  "1": "Too much paperwork",
-  "2": "Long wait time",
+  "1": "Too many documents",
+  "2": "Too many approval levels",
+  "3": "Delay in processing",
+  "4": "Need to visit multiple offices",
+  "5": "Lack of online option",
+  "6": "Repetitive verification",
+  "7": "Other",
 };

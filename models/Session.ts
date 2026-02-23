@@ -13,6 +13,7 @@ export type SessionStep = 0 | 1 | 2 | 3 | 4 | 5;
 // ── TypeScript interface ──────────────────────────────────────────────────────
 
 export interface IAnswers {
+  flow_choice: number | null;
   rating: number | null;
   feedback: string | null;
   scheme_suggestion: string | null;
@@ -45,6 +46,7 @@ export interface ISession extends Document {
 
 const AnswersSchema = new Schema<IAnswers>(
   {
+    flow_choice: { type: Number, default: null },
     rating: { type: Number, default: null, min: 1, max: 5 },
     feedback: { type: String, default: null, trim: true },
     scheme_suggestion: { type: String, default: null, trim: true },
@@ -93,6 +95,7 @@ const SessionSchema = new Schema<ISession>(
     answers: {
       type: AnswersSchema,
       default: () => ({
+        flow_choice: null,
         rating: null,
         feedback: null,
         scheme_suggestion: null,
@@ -124,9 +127,8 @@ const SessionSchema = new Schema<ISession>(
 SessionSchema.index({ phone: 1, completed: 1 });
 
 // ── Model (singleton-safe for Next.js hot reload) ─────────────────────────────
-
+delete mongoose.models.Session;
 const Session: Model<ISession> =
-  mongoose.models.Session ??
   mongoose.model<ISession>("Session", SessionSchema);
 
 export default Session;

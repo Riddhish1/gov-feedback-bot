@@ -3,6 +3,7 @@ import twilio from "twilio";
 
 import { connectDB } from "@/lib/db";
 import { QUESTIONS } from "@/lib/questions";
+import { handleOfficeFlow, handlePolicyFlow, handleProcessFlow } from "@/lib/flowHandlers";
 import Office from "@/models/Office";
 import Session from "@/models/Session";
 
@@ -113,6 +114,7 @@ export async function POST(request: NextRequest): Promise<Response> {
         current_step: 1,
         completed: false,
         answers: {
+          flow_choice: null,
           rating: null,
           feedback: null,
           scheme_suggestion: null,
@@ -120,7 +122,7 @@ export async function POST(request: NextRequest): Promise<Response> {
         },
       });
 
-      return twimlResponse(QUESTIONS.Q1(office.office_name));
+      return twimlResponse(QUESTIONS.GREETING(office.office_name));
     }
 
     // ── Handle START_OFFICE_<id>  (legacy / fallback trigger) ────────────────
@@ -144,10 +146,13 @@ export async function POST(request: NextRequest): Promise<Response> {
     }).sort({ created_at: -1 });
 
     if (!existingSession) {
-      // No active session — try to start one using the message as an office_id
+      // No active session — try to start one using the message as an office_id or digipin
       const officeCandidate = messageText.trim();
       const matchedOffice = await Office.findOne({
-        office_id: officeCandidate,
+        $or: [
+          { office_id: officeCandidate },
+          { digipin: officeCandidate }
+        ]
       }).lean();
 
       if (matchedOffice) {
@@ -164,71 +169,59 @@ export async function POST(request: NextRequest): Promise<Response> {
     const session = existingSession;
 
     // ── Conversation state machine ─────────────────────────────────────────────
-    switch (session.current_step) {
-      // ── Step 1: Collect rating (1–5) ────────────────────────────────────────
-      case 1: {
-        const rating = parseInt(messageText, 10);
-
-        if (isNaN(rating) || rating < 1 || rating > 5 || String(rating) !== messageText) {
-          // Not a clean integer 1-5 — re-ask
-          return twimlResponse(QUESTIONS.INVALID_RATING);
-        }
-
-        session.answers.rating = rating;
-        session.current_step = 2;
-        await session.save();
-
-        return twimlResponse(QUESTIONS.Q2);
+    if (session.current_step === 1) {
+      // ── Step 1: User picks flow (Office = 1, Policy = 2, Process = 3) ──
+      const choice = parseInt(messageText, 10);
+      if (![1, 2, 3].includes(choice)) {
+        return twimlResponse(QUESTIONS.INVALID_OPTION);
       }
 
-      // ── Step 2: Collect general feedback ────────────────────────────────────
-      case 2: {
-        if (!messageText) {
-          return twimlResponse(
-            "⚠️ Please type your feedback before sending."
-          );
-        }
+      session.answers.flow_choice = choice;
+      session.current_step = 2;
+      await session.save();
 
-        session.answers.feedback = messageText;
-        session.current_step = 3;
-        await session.save();
+      if (choice === 1) return twimlResponse(QUESTIONS.OFFICE_Q1);
+      if (choice === 2) return twimlResponse(QUESTIONS.POLICY_Q1);
+      if (choice === 3) return twimlResponse(QUESTIONS.PROCESS_Q1);
 
-        return twimlResponse(QUESTIONS.Q3);
-      }
-
-      // ── Step 3: Collect scheme suggestion (skippable) ────────────────────────
-      case 3: {
-        session.answers.scheme_suggestion =
-          messageText.toLowerCase() === "skip" ? "" : messageText;
-        session.current_step = 4;
-        await session.save();
-
-        return twimlResponse(QUESTIONS.Q4);
-      }
-
-      // ── Step 4: Collect policy suggestion (skippable) ────────────────────────
-      case 4: {
-        session.answers.policy_suggestion =
-          messageText.toLowerCase() === "skip" ? "" : messageText;
-        session.current_step = 5;
-        session.completed = true;
-        await session.save();
-
-        return twimlResponse(QUESTIONS.FINAL);
-      }
-
+      return twimlResponse(QUESTIONS.ERROR);
+    }
+    else if (session.current_step === 5) {
       // ── Step 5: Session already complete ────────────────────────────────────
-      case 5: {
-        return twimlResponse(QUESTIONS.SESSION_COMPLETED);
+      return twimlResponse(QUESTIONS.SESSION_COMPLETED);
+    }
+    else if (session.current_step >= 2 && session.current_step <= 4) {
+      // ── Step 2-4: Hand off to specific flow handlers ────────────────────────
+      let flowRes: { message: string; nextStep: number; completed: boolean };
+
+      switch (session.answers.flow_choice) {
+        case 1:
+          flowRes = await handleOfficeFlow(session, messageText);
+          break;
+        case 2:
+          flowRes = await handlePolicyFlow(session, messageText);
+          break;
+        case 3:
+          flowRes = await handleProcessFlow(session, messageText);
+          break;
+        default:
+          return twimlResponse(QUESTIONS.ERROR);
       }
 
-      // ── Unknown state ────────────────────────────────────────────────────────
-      default: {
-        console.error(
-          `[Twilio Webhook] Unknown session step ${session.current_step} for phone ${phone}`
-        );
-        return twimlResponse(QUESTIONS.ERROR);
+      session.current_step = flowRes.nextStep as any;
+      if (flowRes.completed) {
+        session.completed = true;
       }
+      await session.save();
+
+      return twimlResponse(flowRes.message);
+    }
+    else {
+      // ── Unknown state ────────────────────────────────────────────────────────
+      console.error(
+        `[Twilio Webhook] Unknown session step ${session.current_step} for phone ${phone}`
+      );
+      return twimlResponse(QUESTIONS.ERROR);
     }
   } catch (error) {
     // Log the full error server-side, never expose internals to WhatsApp
