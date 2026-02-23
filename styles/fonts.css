@@ -1,0 +1,9 @@
+/* Fonts are loaded via Next.js `next/font` in `app/layout.tsx`.
+	 Keep CSS fallback variables here for environments where the variable fonts
+	 aren't available. Do NOT include @import rules here to avoid build-time
+	 CSS ordering issues. */
+
+:root {
+	--font-geist-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+	--font-geist-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, "Roboto Mono", "Courier New", monospace;
+}
