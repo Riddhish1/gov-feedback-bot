@@ -1,8 +1,9 @@
 "use client";
 
-import React, { useState, useMemo } from 'react';
-import { Search, TrendingUp, Minus, Filter, Download, Plus, ChevronUp, ChevronDown } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Search, TrendingUp, Minus, Filter, Download, Plus, ChevronUp, ChevronDown, Loader2, X, Copy, Check, QrCode } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import { motion, AnimatePresence } from 'framer-motion';
 
 const C = {
   blue: '#0B6CF5',
@@ -16,59 +17,255 @@ const C = {
   borderLight: '#F0F4F8',
   shadow: '0 1px 4px rgba(15,23,36,0.06), 0 1px 2px rgba(15,23,36,0.04)',
   green: '#10B981',
+  greenSoft: '#ECFDF5',
 };
 
-const officeRegistry = [
-  { id: 1, name: 'Pune Revenue Office A', dept: 'Revenue', type: 'Revenue', district: 'Pune', division: 'Pune', omes: 3.12, trend: 'improving', status: 'Active', submissions: 2840 },
-  { id: 2, name: 'Nashik Municipal North', dept: 'Municipal', type: 'Municipal', district: 'Nashik', division: 'Nashik', omes: 2.94, trend: 'improving', status: 'Escalation Review', submissions: 1920 },
-  { id: 3, name: 'Nagpur Tahsildar Office B', dept: 'Revenue', type: 'Tahsildar', district: 'Nagpur', division: 'Nagpur', omes: 3.28, trend: 'stable', status: 'Active', submissions: 3120 },
-  { id: 4, name: 'Mumbai Transport Office Central', dept: 'Transport', type: 'Transport', district: 'Mumbai', division: 'Konkan', omes: 3.05, trend: 'improving', status: 'Escalation Review', submissions: 4680 },
-  { id: 5, name: 'Aurangabad Revenue Office A', dept: 'Revenue', type: 'Revenue', district: 'Aurangabad', division: 'Aurangabad', omes: 3.58, trend: 'improving', status: 'Active', submissions: 1840 },
-  { id: 6, name: 'Pune Municipal Office East', dept: 'Municipal', type: 'Municipal', district: 'Pune', division: 'Pune', omes: 3.74, trend: 'improving', status: 'Active', submissions: 3240 },
-  { id: 7, name: 'Kolhapur Tahsildar North', dept: 'Revenue', type: 'Tahsildar', district: 'Kolhapur', division: 'Pune', omes: 3.42, trend: 'stable', status: 'Active', submissions: 1680 },
-  { id: 8, name: 'Solapur Revenue Office B', dept: 'Revenue', type: 'Revenue', district: 'Solapur', division: 'Pune', omes: 2.87, trend: 'improving', status: 'Active', submissions: 1280 },
-  { id: 9, name: 'Nagpur Municipal West', dept: 'Municipal', type: 'Municipal', district: 'Nagpur', division: 'Nagpur', omes: 3.65, trend: 'stable', status: 'Active', submissions: 2960 },
-  { id: 10, name: 'Mumbai Sub-Divisional Office A', dept: 'Revenue', type: 'Sub-Divisional', district: 'Mumbai', division: 'Konkan', omes: 4.02, trend: 'improving', status: 'Active', submissions: 5840 },
-  { id: 11, name: 'Nashik Revenue Office South', dept: 'Revenue', type: 'Revenue', district: 'Nashik', division: 'Nashik', omes: 3.31, trend: 'stable', status: 'Active', submissions: 1540 },
-  { id: 12, name: 'Aurangabad Municipal Central', dept: 'Municipal', type: 'Municipal', district: 'Aurangabad', division: 'Aurangabad', omes: 3.19, trend: 'improving', status: 'Active', submissions: 2240 },
-  { id: 13, name: 'Pune Transport Office Central', dept: 'Transport', type: 'Transport', district: 'Pune', division: 'Pune', omes: 3.88, trend: 'improving', status: 'Active', submissions: 4120 },
-  { id: 14, name: 'Amravati Revenue Office A', dept: 'Revenue', type: 'Revenue', district: 'Amravati', division: 'Amravati', omes: 2.76, trend: 'improving', status: 'Active', submissions: 980 },
-  { id: 15, name: 'Nagpur Transport Office B', dept: 'Transport', type: 'Transport', district: 'Nagpur', division: 'Nagpur', omes: 3.46, trend: 'stable', status: 'Active', submissions: 3680 },
-];
+function OfficeDrawer({ office, onClose }: { office: any | null; onClose: () => void }) {
+  const [copied, setCopied] = useState(false);
 
-type SortKey = 'name' | 'district' | 'omes' | 'submissions';
+  return (
+    <AnimatePresence>
+      {office && (
+        <>
+          <motion.div
+            key="backdrop"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            onClick={onClose}
+            style={{
+              position: 'fixed',
+              inset: 0,
+              background: 'rgba(15, 23, 36, 0.18)',
+              zIndex: 40,
+              backdropFilter: 'blur(2px)',
+            }}
+          />
+          <motion.div
+            key="drawer"
+            initial={{ x: '100%' }}
+            animate={{ x: 0 }}
+            exit={{ x: '100%' }}
+            transition={{ type: 'spring', damping: 28, stiffness: 280 }}
+            style={{
+              position: 'fixed',
+              right: 0,
+              top: 0,
+              bottom: 0,
+              width: '420px',
+              background: C.white,
+              zIndex: 50,
+              overflow: 'auto',
+              boxShadow: '-12px 0 48px rgba(11,108,245,0.08), -2px 0 8px rgba(0,0,0,0.06)',
+              display: 'flex',
+              flexDirection: 'column',
+            }}
+          >
+            {/* Drawer Header */}
+            <div
+              style={{
+                padding: '28px 28px 20px',
+                borderBottom: `1px solid ${C.border}`,
+                background: C.white,
+                position: 'sticky',
+                top: 0,
+                zIndex: 1,
+              }}
+            >
+              <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '12px' }}>
+                <div>
+                  <div style={{ fontSize: '18px', fontWeight: '640', color: C.text, letterSpacing: '-0.4px', marginBottom: '6px' }}>
+                    {office.office_name}
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <span
+                      style={{
+                        background: C.blueSoft,
+                        color: C.blue,
+                        fontSize: '11.5px',
+                        fontWeight: '520',
+                        padding: '3px 10px',
+                        borderRadius: '20px',
+                        border: `1px solid ${C.blueMid}`,
+                      }}
+                    >
+                      {office.district}
+                    </span>
+                    <span
+                      style={{
+                        background: office.is_active ? C.bg : '#FFFBEB',
+                        color: office.is_active ? C.textSec : '#92400E',
+                        fontSize: '11.5px',
+                        fontWeight: '520',
+                        padding: '3px 10px',
+                        borderRadius: '20px',
+                        border: `1px solid ${office.is_active ? C.border : '#FDE68A'}`,
+                      }}
+                    >
+                      {office.is_active ? 'Active' : 'Inactive'}
+                    </span>
+                  </div>
+                </div>
+                <button
+                  onClick={onClose}
+                  style={{
+                    width: '32px',
+                    height: '32px',
+                    borderRadius: '8px',
+                    border: `1px solid ${C.border}`,
+                    background: C.white,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    cursor: 'pointer',
+                    color: C.textSec,
+                    flexShrink: 0,
+                  }}
+                >
+                  <X size={15} />
+                </button>
+              </div>
+            </div>
+
+            {/* QR Section */}
+            <div style={{ padding: '32px 28px', flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+              <div style={{ marginBottom: '20px', textAlign: 'center' }}>
+                <div
+                  style={{
+                    width: '48px',
+                    height: '48px',
+                    background: C.blueSoft,
+                    borderRadius: '12px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    margin: '0 auto 12px',
+                  }}
+                >
+                  <QrCode size={20} color={C.blue} />
+                </div>
+                <h3 style={{ fontSize: '15px', fontWeight: '600', color: C.text, marginBottom: '6px', letterSpacing: '-0.2px' }}>
+                  Feedback QR Portal
+                </h3>
+                <p style={{ fontSize: '12.5px', color: C.textSec, maxWidth: '260px', lineHeight: 1.5 }}>
+                  Print or display this code at the office to allow citizens to instantly submit secure feedback via WhatsApp.
+                </p>
+              </div>
+
+              <div
+                style={{
+                  padding: '16px',
+                  background: 'white',
+                  border: `1px solid ${C.border}`,
+                  borderRadius: '14px',
+                  boxShadow: C.shadow,
+                  marginBottom: '28px',
+                }}
+              >
+                <img
+                  src={`/api/offices/${office.office_id}/qr?size=300`}
+                  alt="Office QR Code"
+                  width={220}
+                  height={220}
+                  style={{ display: 'block', borderRadius: '8px' }}
+                />
+              </div>
+
+              <button
+                onClick={() => {
+                  navigator.clipboard.writeText(office.office_id);
+                  setCopied(true);
+                  setTimeout(() => setCopied(false), 2000);
+                }}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                  padding: '10px 24px',
+                  background: copied ? C.greenSoft : C.blue,
+                  color: copied ? '#15803D' : 'white',
+                  borderRadius: '9px',
+                  fontSize: '13px',
+                  fontWeight: '520',
+                  border: `1px solid ${copied ? C.green : C.blue}`,
+                  cursor: 'pointer',
+                  transition: 'all 0.2s',
+                  width: '260px',
+                  justifyContent: 'center',
+                }}
+              >
+                {copied ? <Check size={14} /> : <Copy size={14} />}
+                {copied ? 'DIGIPIN Copied' : `Copy DIGIPIN (${office.digipin || office.office_id})`}
+              </button>
+            </div>
+          </motion.div>
+        </>
+      )}
+    </AnimatePresence>
+  );
+}
+
+type SortKey = 'name' | 'district' | 'omes' | 'expected_visitors';
 
 export function OfficeRegistry() {
   const router = useRouter();
+  const [selectedOffice, setSelectedOffice] = useState<any | null>(null);
   const [search, setSearch] = useState('');
   const [divisionFilter, setDivisionFilter] = useState('');
   const [deptFilter, setDeptFilter] = useState('');
   const [sortKey, setSortKey] = useState<SortKey>('omes');
   const [sortDir, setSortDir] = useState<'asc' | 'desc'>('desc');
 
-  const divisions = [...new Set(officeRegistry.map((o) => o.division))].sort();
-  const departments = [...new Set(officeRegistry.map((o) => o.dept))].sort();
+  const [offices, setOffices] = useState<any[]>([]);
+  const [totalOffices, setTotalOffices] = useState(0);
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [isLoading, setIsLoading] = useState(true);
 
-  const filtered = useMemo(() => {
-    return officeRegistry
-      .filter((o) => {
-        const matchSearch =
-          o.name.toLowerCase().includes(search.toLowerCase()) ||
-          o.district.toLowerCase().includes(search.toLowerCase());
-        const matchDiv = divisionFilter ? o.division === divisionFilter : true;
-        const matchDept = deptFilter ? o.dept === deptFilter : true;
-        return matchSearch && matchDiv && matchDept;
-      })
-      .sort((a, b) => {
-        let va: string | number = a[sortKey] ?? '';
-        let vb: string | number = b[sortKey] ?? '';
-        if (typeof va === 'string') va = va.toLowerCase();
-        if (typeof vb === 'string') vb = vb.toLowerCase();
-        if (va < vb) return sortDir === 'asc' ? -1 : 1;
-        if (va > vb) return sortDir === 'asc' ? 1 : -1;
-        return 0;
+  const [divisions, setDivisions] = useState<string[]>([]);
+  const [departments, setDepartments] = useState<string[]>([]);
+
+  const limit = 15;
+
+  const fetchOffices = async () => {
+    try {
+      setIsLoading(true);
+      const query = new URLSearchParams({
+        page: page.toString(),
+        limit: limit.toString(),
+        search,
+        division: divisionFilter,
+        dept: deptFilter,
+        sortKey,
+        sortDir
       });
-  }, [search, divisionFilter, deptFilter, sortKey, sortDir]);
+
+      const res = await fetch(`/api/offices?${query.toString()}`);
+      const data = await res.json();
+
+      setOffices(data.offices || []);
+      setTotalOffices(data.total || 0);
+      setTotalPages(data.totalPages || 1);
+
+      // Seed filters if they are empty
+      if (divisions.length === 0 && data.divisions) {
+        setDivisions(data.divisions);
+        setDepartments(data.departments);
+      }
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchOffices();
+  }, [page, search, divisionFilter, deptFilter, sortKey, sortDir]);
+
+  // Reset page when filters change
+  useEffect(() => { setPage(1); }, [search, divisionFilter, deptFilter, sortKey, sortDir]);
 
   const handleSort = (key: SortKey) => {
     if (sortKey === key) setSortDir(sortDir === 'asc' ? 'desc' : 'asc');
@@ -80,7 +277,15 @@ export function OfficeRegistry() {
       sortDir === 'asc' ? <ChevronUp size={11} /> : <ChevronDown size={11} />
     ) : null;
 
-  const avgOmes = (filtered.reduce((sum, o) => sum + o.omes, 0) / filtered.length).toFixed(2);
+  const avgVisitors = offices.length
+    ? Math.round(offices.reduce((acc, o) => acc + (o.expected_visitors || 0), 0) / offices.length)
+    : 0;
+
+  const improvingPct = offices.length
+    ? Math.round((offices.filter((o) => (o.metrics?.trend || 'stable') === 'improving').length / offices.length) * 100)
+    : 0;
+
+  const underReviewCount = offices.filter((o) => !o.is_active).length;
 
   return (
     <div style={{ padding: '40px 48px', maxWidth: '1400px', margin: '0 auto' }}>
@@ -97,7 +302,7 @@ export function OfficeRegistry() {
               Full Office Registry
             </h1>
             <p style={{ fontSize: '14px', color: C.textSec }}>
-              All registered offices across Maharashtra · 312 total
+              All registered offices across Maharashtra · {totalOffices} total
             </p>
           </div>
           <div style={{ display: 'flex', gap: '10px' }}>
@@ -132,10 +337,10 @@ export function OfficeRegistry() {
       {/* Summary Strip */}
       <div style={{ display: 'flex', gap: '12px', marginBottom: '24px' }}>
         {[
-          { label: 'Showing', value: `${filtered.length} Offices` },
-          { label: 'Avg OMES', value: avgOmes },
-          { label: 'Improving', value: `${filtered.filter(o => o.trend === 'improving').length}` },
-          { label: 'Under Review', value: `${filtered.filter(o => o.status !== 'Active').length}` },
+          { label: 'Total Offices', value: `${totalOffices}` },
+          { label: 'Avg Visitors', value: `${avgVisitors}` },
+          { label: 'Improving', value: improvingPct },
+          { label: 'Under Review', value: `${underReviewCount}` },
         ].map((s) => (
           <div
             key={s.label}
@@ -235,7 +440,7 @@ export function OfficeRegistry() {
             { k: null, label: 'Division' },
             { k: 'omes' as SortKey, label: 'OMES' },
             { k: null, label: 'Trend' },
-            { k: 'submissions' as SortKey, label: 'Submissions' },
+            { k: 'expected_visitors' as SortKey, label: 'Expected Visitors' },
           ].map(({ k, label }) => (
             <div
               key={label}
@@ -255,85 +460,103 @@ export function OfficeRegistry() {
         </div>
 
         {/* Rows */}
-        {filtered.map((office, idx) => (
-          <div
-            key={office.id}
-            style={{
-              display: 'grid',
-              gridTemplateColumns: '2.5fr 1fr 1fr 1fr 1fr 1fr 1fr',
-              padding: '14px 24px',
-              borderBottom: idx < filtered.length - 1 ? `1px solid ${C.borderLight}` : 'none',
-              alignItems: 'center',
-              transition: 'background 0.1s',
-              cursor: 'pointer',
-            }}
-            onMouseEnter={(e) => ((e.currentTarget as HTMLDivElement).style.background = C.bg)}
-            onMouseLeave={(e) => ((e.currentTarget as HTMLDivElement).style.background = 'transparent')}
-          >
-            <div>
-              <div style={{ fontSize: '13.5px', fontWeight: '520', color: C.text, letterSpacing: '-0.2px', marginBottom: '2px' }}>
-                {office.name}
-              </div>
-              <span
-                style={{
-                  padding: '2px 8px',
-                  background: office.status === 'Active' ? C.bg : '#FFFBEB',
-                  color: office.status === 'Active' ? C.textSec : '#92400E',
-                  borderRadius: '20px',
-                  fontSize: '10.5px',
-                  fontWeight: '500',
-                  border: `1px solid ${office.status === 'Active' ? C.border : '#FDE68A'}`,
-                }}
-              >
-                {office.status}
-              </span>
-            </div>
-
-            <div style={{ fontSize: '12.5px', color: C.textSec }}>{office.dept}</div>
-            <div style={{ fontSize: '12.5px', color: C.text }}>{office.district}</div>
-            <div style={{ fontSize: '12.5px', color: C.textSec }}>{office.division}</div>
-
-            <div>
-              <span style={{ fontSize: '14px', fontWeight: '640', color: C.text, letterSpacing: '-0.3px' }}>
-                {office.omes.toFixed(2)}
-              </span>
-              <div style={{ height: '2.5px', background: C.border, borderRadius: '2px', marginTop: '5px', width: '40px', overflow: 'hidden' }}>
-                <div style={{ height: '100%', width: `${(office.omes / 5) * 100}%`, background: C.blue, borderRadius: '2px', opacity: 0.6 }} />
-              </div>
-            </div>
-
-            <div>
-              {office.trend === 'improving' ? (
-                <span
-                  style={{
-                    display: 'inline-flex', alignItems: 'center', gap: '4px',
-                    padding: '3px 9px', background: '#F0FDF4', color: '#15803D',
-                    borderRadius: '20px', fontSize: '11px', fontWeight: '520',
-                  }}
-                >
-                  <TrendingUp size={9} /> Improving
-                </span>
-              ) : (
-                <span
-                  style={{
-                    display: 'inline-flex', alignItems: 'center', gap: '4px',
-                    padding: '3px 9px', background: C.bg, color: C.textSec,
-                    borderRadius: '20px', fontSize: '11px', fontWeight: '520',
-                    border: `1px solid ${C.border}`,
-                  }}
-                >
-                  <Minus size={9} /> Stable
-                </span>
-              )}
-            </div>
-
-            <div style={{ fontSize: '13px', fontWeight: '520', color: C.text }}>
-              {office.submissions.toLocaleString()}
-            </div>
+        {isLoading ? (
+          <div style={{ padding: '60px', textAlign: 'center', color: C.textSec, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px' }}>
+            <Loader2 size={24} className="animate-spin" color={C.blue} />
+            <span style={{ fontSize: '14px' }}>Loading office registry...</span>
           </div>
-        ))}
+        ) : offices.length > 0 ? (
+          offices.map((office, idx) => (
+            <div
+              key={office.office_id || office._id || idx}
+              onClick={() => setSelectedOffice(office)}
+              style={{
+                display: 'grid',
+                gridTemplateColumns: '2.5fr 1fr 1fr 1fr 1fr 1fr 1fr',
+                padding: '14px 24px',
+                borderBottom: idx < offices.length - 1 ? `1px solid ${C.borderLight}` : 'none',
+                alignItems: 'center',
+                transition: 'background 0.1s',
+                cursor: 'pointer',
+              }}
+              onMouseEnter={(e) => ((e.currentTarget as HTMLDivElement).style.background = C.bg)}
+              onMouseLeave={(e) => ((e.currentTarget as HTMLDivElement).style.background = 'transparent')}
+            >
+              <div>
+                <div style={{ fontSize: '13.5px', fontWeight: '520', color: C.text, letterSpacing: '-0.2px', marginBottom: '2px' }}>
+                  {office.office_name}
+                </div>
+                <span
+                  style={{
+                    padding: '2px 8px',
+                    background: office.is_active ? C.bg : '#FFFBEB',
+                    color: office.is_active ? C.textSec : '#92400E',
+                    borderRadius: '20px',
+                    fontSize: '10.5px',
+                    fontWeight: '500',
+                    border: `1px solid ${office.is_active ? C.border : '#FDE68A'}`,
+                  }}
+                >
+                  {office.is_active ? 'Active' : 'Inactive'}
+                </span>
+              </div>
 
-        {filtered.length === 0 && (
+              <div style={{ fontSize: '12.5px', color: C.textSec }}>{office.department || '---'}</div>
+              <div style={{ fontSize: '12.5px', color: C.text }}>{office.district || '---'}</div>
+              <div style={{ fontSize: '12.5px', color: C.textSec }}>{office.division || '---'}</div>
+
+              <div>
+                <span style={{ fontSize: '14px', fontWeight: '640', color: C.text, letterSpacing: '-0.3px' }}>
+                  {office.metrics?.omes ? office.metrics.omes.toFixed(2) : 'N/A'}
+                </span>
+                {office.metrics?.omes && (
+                  <div style={{ height: '2.5px', background: C.border, borderRadius: '2px', marginTop: '5px', width: '40px', overflow: 'hidden' }}>
+                    <div style={{ height: '100%', width: `${(office.metrics.omes / 5) * 100}%`, background: C.blue, borderRadius: '2px', opacity: 0.6 }} />
+                  </div>
+                )}
+              </div>
+
+              <div>
+                {office.metrics?.trend === 'improving' ? (
+                  <span
+                    style={{
+                      display: 'inline-flex', alignItems: 'center', gap: '4px',
+                      padding: '3px 9px', background: '#F0FDF4', color: '#15803D',
+                      borderRadius: '20px', fontSize: '11px', fontWeight: '520',
+                    }}
+                  >
+                    <TrendingUp size={9} /> Improving
+                  </span>
+                ) : office.metrics?.trend === 'declining' ? (
+                  <span
+                    style={{
+                      display: 'inline-flex', alignItems: 'center', gap: '4px',
+                      padding: '3px 9px', background: '#FEF2F2', color: '#B91C1C',
+                      borderRadius: '20px', fontSize: '11px', fontWeight: '520',
+                      border: `1px solid #FCA5A5`,
+                    }}
+                  >
+                    <TrendingUp size={9} style={{ transform: 'rotate(180deg)' }} /> Declining
+                  </span>
+                ) : (
+                  <span
+                    style={{
+                      display: 'inline-flex', alignItems: 'center', gap: '4px',
+                      padding: '3px 9px', background: C.bg, color: C.textSec,
+                      borderRadius: '20px', fontSize: '11px', fontWeight: '520',
+                      border: `1px solid ${C.border}`,
+                    }}
+                  >
+                    <Minus size={9} /> Pending
+                  </span>
+                )}
+              </div>
+
+              <div style={{ fontSize: '13px', fontWeight: '520', color: C.text }}>
+                {office.expected_visitors ? office.expected_visitors.toLocaleString() : '---'}
+              </div>
+            </div>
+          ))) : (
           <div style={{ padding: '48px', textAlign: 'center', color: C.textSec, fontSize: '14px' }}>
             No offices match your current filters.
           </div>
@@ -347,32 +570,35 @@ export function OfficeRegistry() {
           }}
         >
           <span style={{ fontSize: '12px', color: C.textSec }}>
-            Showing {filtered.length} of 312 registered offices
+            Showing {offices.length} of {totalOffices} registered offices
           </span>
-          <div style={{ display: 'flex', gap: '6px' }}>
-            {[1, 2, 3, '...', 21].map((p, i) => (
-              <button
-                key={i}
-                style={{
-                  width: '28px', height: '28px', borderRadius: '7px',
-                  border: `1px solid ${p === 1 ? C.blue : C.border}`,
-                  background: p === 1 ? C.blue : C.white,
-                  color: p === 1 ? 'white' : C.textSec,
-                  fontSize: '12px', cursor: 'pointer', fontFamily: 'inherit',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                }}
-              >
-                {p}
-              </button>
-            ))}
-          </div>
+          {totalPages > 1 && (
+            <div style={{ display: 'flex', gap: '6px' }}>
+              {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
+                <button
+                  key={p}
+                  onClick={() => setPage(p)}
+                  style={{
+                    width: '28px', height: '28px', borderRadius: '7px',
+                    border: `1px solid ${p === page ? C.blue : C.border}`,
+                    background: p === page ? C.blue : C.white,
+                    color: p === page ? 'white' : C.textSec,
+                    fontSize: '12px', cursor: 'pointer', fontFamily: 'inherit',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    transition: 'all 0.15s'
+                  }}
+                >
+                  {p}
+                </button>
+              ))}
+            </div>
+          )}
         </div>
       </div>
+      <OfficeDrawer office={selectedOffice} onClose={() => setSelectedOffice(null)} />
     </div>
   );
-}
-
-// Default export for Next.js App Router
+}      // Default export for Next.js App Router
 export default function Page() {
   return <OfficeRegistry />;
 }

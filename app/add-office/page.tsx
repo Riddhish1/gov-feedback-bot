@@ -38,59 +38,7 @@ const allServices = [
   'Non-Creamy Layer Certificate',
 ];
 
-/* ─── Mini QR Code SVG ─────────────────────────────────── */
-function QRCodeSVG({ value }: { value: string }) {
-  const size = 160;
-  const cells = 21;
-  const cellSize = size / cells;
-
-  // Generate a deterministic pattern from the value string
-  const hash = value.split('').reduce((acc, char) => {
-    return ((acc << 5) - acc + char.charCodeAt(0)) | 0;
-  }, 0);
-
-  const pattern: boolean[][] = [];
-  for (let r = 0; r < cells; r++) {
-    pattern[r] = [];
-    for (let c = 0; c < cells; c++) {
-      // Finder patterns (corners)
-      const inTopLeft = r < 7 && c < 7;
-      const inTopRight = r < 7 && c >= cells - 7;
-      const inBottomLeft = r >= cells - 7 && c < 7;
-
-      if (inTopLeft || inTopRight || inBottomLeft) {
-        const lr = inTopLeft ? r : inTopRight ? r : r - (cells - 7);
-        const lc = inTopLeft ? c : inTopRight ? c - (cells - 7) : c;
-        const outerBorder = lr === 0 || lr === 6 || lc === 0 || lc === 6;
-        const innerSquare = lr >= 2 && lr <= 4 && lc >= 2 && lc <= 4;
-        pattern[r][c] = outerBorder || innerSquare;
-      } else {
-        const seed = (hash ^ (r * 31 + c * 17)) >>> 0;
-        pattern[r][c] = seed % 3 !== 0;
-      }
-    }
-  }
-
-  return (
-    <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
-      <rect width={size} height={size} fill="white" />
-      {pattern.map((row, r) =>
-        row.map((cell, c) =>
-          cell ? (
-            <rect
-              key={`${r}-${c}`}
-              x={c * cellSize}
-              y={r * cellSize}
-              width={cellSize}
-              height={cellSize}
-              fill="#0F1724"
-            />
-          ) : null
-        )
-      )}
-    </svg>
-  );
-}
+/* Drop local QRCodeSVG since we use the official API */
 
 /* ─── Field Component ────────────────────────────────────── */
 function Field({
@@ -100,6 +48,7 @@ function Field({
   placeholder,
   type = 'text',
   hint,
+  required,
 }: {
   label: string;
   value: string;
@@ -107,6 +56,7 @@ function Field({
   placeholder?: string;
   type?: string;
   hint?: string;
+  required?: boolean;
 }) {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
@@ -119,6 +69,7 @@ function Field({
         }}
       >
         {label}
+        {required && <span style={{ color: '#E11D48', marginLeft: '3px' }}>*</span>}
       </label>
       <input
         type={type}
@@ -141,6 +92,57 @@ function Field({
         onBlur={(e) => (e.target.style.borderColor = C.border)}
       />
       {hint && <span style={{ fontSize: '11.5px', color: C.textSec }}>{hint}</span>}
+    </div>
+  );
+}
+
+function ComboboxField({
+  label,
+  value,
+  onChange,
+  options,
+  placeholder,
+  required,
+}: {
+  label: string;
+  value: string;
+  onChange: (v: string) => void;
+  options: string[];
+  placeholder?: string;
+  required?: boolean;
+}) {
+  const listId = `list-${label.replace(/\s+/g, '-')}`;
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+      <label style={{ fontSize: '12.5px', fontWeight: '560', color: C.text, letterSpacing: '-0.1px' }}>
+        {label}
+        {required && <span style={{ color: '#E11D48', marginLeft: '3px' }}>*</span>}
+      </label>
+      <input
+        list={listId}
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        placeholder={placeholder || 'Type or select...'}
+        style={{
+          padding: '10px 14px',
+          background: C.bg,
+          border: `1px solid ${C.border}`,
+          borderRadius: '9px',
+          fontSize: '13.5px',
+          color: C.text,
+          outline: 'none',
+          fontFamily: 'inherit',
+          transition: 'border-color 0.15s',
+          letterSpacing: '-0.1px',
+        }}
+        onFocus={(e) => (e.target.style.borderColor = C.blue)}
+        onBlur={(e) => (e.target.style.borderColor = C.border)}
+      />
+      <datalist id={listId}>
+        {options.map((o) => (
+          <option key={o} value={o} />
+        ))}
+      </datalist>
     </div>
   );
 }
@@ -196,19 +198,36 @@ export function AddOffice() {
   const router = useRouter();
   const [step, setStep] = useState(1);
   const [copied, setCopied] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [createdOffice, setCreatedOffice] = useState<any>(null);
 
   const [form, setForm] = useState({
-    officeName: 'Aurangabad Revenue Office C',
-    department: 'Revenue',
-    officeType: 'Revenue',
-    district: 'Aurangabad',
-    division: 'Aurangabad',
-    digipin: 'MH-AU-0043',
-    treasuryCode: 'TR-AU-2211',
-    services: ['Income Certificate', 'Domicile Certificate', 'Land Records'] as string[],
-    expectedVisitors: '180',
-    workingHoursFrom: '10:00',
-    workingHoursTo: '17:00',
+    officeName: '',
+    department: '',
+    officeType: '',
+    district: '',
+    division: '',
+    digipin: '',
+    treasuryCode: '',
+    services: [] as string[],
+    expectedVisitors: '',
+    workingHoursFrom: '',
+    workingHoursTo: '',
+    guardianSecretary: '',
+    officeHeadName: '',
+    officeHeadPhone: '',
+    officeHeadEmail: '',
+    collectorName: '',
+    collectorPhone: '',
+    collectorEmail: '',
+    divCommName: '',
+    divCommPhone: '',
+    divCommEmail: '',
+    address: '',
+    geoLat: '',
+    geoLng: '',
+    tags: '',
+    isActive: true,
   });
 
   const set = (key: keyof typeof form) => (val: string) =>
@@ -225,6 +244,62 @@ export function AddOffice() {
     navigator.clipboard.writeText(form.digipin);
     setCopied(true);
     setTimeout(() => setCopied(false), 1500);
+  };
+
+  const getGeoLocation = () => {
+    if (!navigator.geolocation) {
+      alert("Geolocation is not supported by your browser");
+      return;
+    }
+
+    setIsLoading(true);
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        setForm(f => ({
+          ...f,
+          geoLat: position.coords.latitude.toFixed(6),
+          geoLng: position.coords.longitude.toFixed(6)
+        }));
+        setIsLoading(false);
+      },
+      (error) => {
+        console.error(error);
+        alert("Unable to retrieve your location. Please check browser permissions.");
+        setIsLoading(false);
+      }
+    );
+  };
+
+  const submitOffice = async () => {
+    try {
+      setIsLoading(true);
+
+      const payload = {
+        ...form,
+        tags: form.tags.split(',').map(t => t.trim()).filter(Boolean)
+      };
+
+      const res = await fetch('/api/offices', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(payload)
+      });
+
+      if (!res.ok) {
+        throw new Error("Failed to create office");
+      }
+
+      const data = await res.json();
+      setCreatedOffice(data.office);
+      setStep(4);
+    } catch (error) {
+      console.error(error);
+      alert("Error creating office. Please try again.");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -369,33 +444,113 @@ export function AddOffice() {
                     value={form.officeName}
                     onChange={set('officeName')}
                     placeholder="e.g. Aurangabad Revenue Office C"
+                    required
                   />
                 </div>
-                <SelectField
+                <ComboboxField
                   label="Department"
                   value={form.department}
                   onChange={set('department')}
                   options={['Revenue', 'Municipal', 'Transport', 'Health', 'Education']}
                 />
-                <SelectField
+                <ComboboxField
                   label="Office Type"
                   value={form.officeType}
                   onChange={set('officeType')}
                   options={['Revenue', 'Tahsildar', 'Municipal', 'Transport', 'Sub-Divisional']}
                 />
-                <SelectField
+                <ComboboxField
                   label="District"
                   value={form.district}
                   onChange={set('district')}
                   options={['Aurangabad', 'Pune', 'Nashik', 'Nagpur', 'Mumbai', 'Solapur', 'Kolhapur']}
+                  required
                 />
-                <SelectField
+                <ComboboxField
                   label="Division"
                   value={form.division}
                   onChange={set('division')}
                   options={['Aurangabad', 'Pune', 'Nashik', 'Nagpur', 'Konkan', 'Amravati']}
                 />
+
+                <div style={{ gridColumn: '1 / -1' }}>
+                  <Field label="Address" value={form.address} onChange={set('address')} placeholder="Full office address" />
+                </div>
+                <div style={{ gridColumn: '1 / -1', display: 'flex', gap: '18px', alignItems: 'flex-end' }}>
+                  <div style={{ flex: 1 }}><Field label="Latitude (Geo)" value={form.geoLat} onChange={set('geoLat')} placeholder="e.g. 19.8762" type="number" /></div>
+                  <div style={{ flex: 1 }}><Field label="Longitude (Geo)" value={form.geoLng} onChange={set('geoLng')} placeholder="e.g. 75.3433" type="number" /></div>
+                  <button
+                    onClick={getGeoLocation}
+                    type="button"
+                    style={{
+                      height: '42px',
+                      padding: '0 16px',
+                      background: C.white,
+                      border: `1px solid ${C.border}`,
+                      borderRadius: '9px',
+                      fontSize: '13px',
+                      color: C.textSec,
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '6px'
+                    }}
+                  >
+                    Get Location
+                  </button>
+                </div>
               </div>
+
+              {/* Hierarchy Contacts Section */}
+              <div style={{ marginTop: '32px' }}>
+                <div style={{ fontSize: '14px', fontWeight: '640', color: C.text, letterSpacing: '-0.3px', marginBottom: '16px' }}>
+                  Hierarchy & Contacts
+                </div>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '18px' }}>
+                  <Field
+                    label="Guardian Secretary"
+                    value={form.guardianSecretary}
+                    onChange={set('guardianSecretary')}
+                    placeholder="e.g. Shri. XYZ"
+                  />
+                  <div style={{ gridColumn: '1 / -1', borderTop: `1px dashed ${C.border}`, margin: '8px 0' }} />
+
+                  {/* Office Head Contact */}
+                  <div style={{ gridColumn: '1 / -1', fontSize: '12.5px', fontWeight: '560', color: C.textSec }}>
+                    Office Head Contact
+                  </div>
+                  <Field label="Name" value={form.officeHeadName} onChange={set('officeHeadName')} placeholder="Officer Name" />
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '18px', gridColumn: '1 / -1' }}>
+                    <Field label="Phone" value={form.officeHeadPhone} onChange={set('officeHeadPhone')} placeholder="Phone Number" type="tel" />
+                    <Field label="Email" value={form.officeHeadEmail} onChange={set('officeHeadEmail')} placeholder="Email Address" type="email" />
+                  </div>
+
+                  <div style={{ gridColumn: '1 / -1', borderTop: `1px dashed ${C.border}`, margin: '8px 0' }} />
+
+                  {/* Collector Contact */}
+                  <div style={{ gridColumn: '1 / -1', fontSize: '12.5px', fontWeight: '560', color: C.textSec }}>
+                    Collector Contact
+                  </div>
+                  <Field label="Name" value={form.collectorName} onChange={set('collectorName')} placeholder="Collector Name" />
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '18px', gridColumn: '1 / -1' }}>
+                    <Field label="Phone" value={form.collectorPhone} onChange={set('collectorPhone')} placeholder="Phone Number" type="tel" />
+                    <Field label="Email" value={form.collectorEmail} onChange={set('collectorEmail')} placeholder="Email Address" type="email" />
+                  </div>
+
+                  <div style={{ gridColumn: '1 / -1', borderTop: `1px dashed ${C.border}`, margin: '8px 0' }} />
+
+                  {/* Divisional Commissioner Contact */}
+                  <div style={{ gridColumn: '1 / -1', fontSize: '12.5px', fontWeight: '560', color: C.textSec }}>
+                    Divisional Commissioner Contact
+                  </div>
+                  <Field label="Name" value={form.divCommName} onChange={set('divCommName')} placeholder="Commissioner Name" />
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '18px', gridColumn: '1 / -1' }}>
+                    <Field label="Phone" value={form.divCommPhone} onChange={set('divCommPhone')} placeholder="Phone Number" type="tel" />
+                    <Field label="Email" value={form.divCommEmail} onChange={set('divCommEmail')} placeholder="Email Address" type="email" />
+                  </div>
+                </div>
+              </div>
+
             </motion.div>
           )}
 
@@ -557,6 +712,15 @@ export function AddOffice() {
                     />
                   </div>
                 </div>
+
+                <div style={{ gridColumn: '1 / -1', borderTop: `1px dashed ${C.border}`, margin: '8px 0' }} />
+                <div style={{ gridColumn: '1 / -1' }}>
+                  <Field label="Tags (comma-separated)" value={form.tags} onChange={set('tags')} placeholder="e.g. pilot, high-traffic" />
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', gridColumn: '1 / -1' }}>
+                  <input type="checkbox" checked={form.isActive} onChange={(e) => setForm(f => ({ ...f, isActive: e.target.checked }))} id="isActiveCheck" style={{ cursor: 'pointer' }} />
+                  <label htmlFor="isActiveCheck" style={{ fontSize: '13px', color: C.text, cursor: 'pointer' }}>Active Office (Receiving Feedback)</label>
+                </div>
               </div>
             </motion.div>
           )}
@@ -715,35 +879,66 @@ export function AddOffice() {
                         WhatsApp QR Code
                       </span>
                     </div>
-                    <div
-                      style={{
-                        padding: '12px',
-                        background: 'white',
-                        border: `1px solid ${C.border}`,
-                        borderRadius: '10px',
-                      }}
-                    >
-                      <QRCodeSVG value={`https://wa.me/919XXXXXXXXX?text=OFFICE_${form.digipin}`} />
-                    </div>
+                    {createdOffice ? (
+                      <div
+                        style={{
+                          padding: '12px',
+                          background: 'white',
+                          border: `1px solid ${C.border}`,
+                          borderRadius: '10px',
+                          display: 'flex',
+                          justifyContent: 'center',
+                          alignItems: 'center'
+                        }}
+                      >
+                        <img
+                          src={`/api/offices/${createdOffice.office_id}/qr?size=300`}
+                          alt="Office QR Code"
+                          width={160}
+                          height={160}
+                        />
+                      </div>
+                    ) : (
+                      <div
+                        style={{
+                          padding: '30px',
+                          background: C.bg,
+                          border: `1px dashed ${C.border}`,
+                          borderRadius: '10px',
+                          color: C.textSec,
+                          fontSize: '12px',
+                          textAlign: 'center',
+                          width: '186px',
+                          height: '186px',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center'
+                        }}
+                      >
+                        Generated upon registration
+                      </div>
+                    )}
                     <div style={{ textAlign: 'center' }}>
                       <div style={{ fontSize: '11.5px', fontWeight: '560', color: C.text, marginBottom: '2px' }}>
-                        {form.digipin}
+                        {form.digipin || '---'}
                       </div>
                       <div style={{ fontSize: '11px', color: C.textSec }}>Scan to submit feedback</div>
                     </div>
                     <button
                       onClick={handleCopy}
+                      disabled={!createdOffice}
                       style={{
                         display: 'flex',
                         alignItems: 'center',
                         gap: '6px',
                         padding: '7px 14px',
-                        background: copied ? C.greenSoft : C.bg,
-                        border: `1px solid ${copied ? C.green : C.border}`,
+                        background: !createdOffice ? C.bg : (copied ? C.greenSoft : C.bg),
+                        border: `1px solid ${!createdOffice ? C.border : (copied ? C.green : C.border)}`,
                         borderRadius: '8px',
                         fontSize: '12px',
-                        color: copied ? '#15803D' : C.textSec,
-                        cursor: 'pointer',
+                        color: !createdOffice ? C.textSec : (copied ? '#15803D' : C.textSec),
+                        cursor: !createdOffice ? 'not-allowed' : 'pointer',
+                        opacity: !createdOffice ? 0.6 : 1,
                         fontFamily: 'inherit',
                         transition: 'all 0.15s',
                         width: '100%',
@@ -809,9 +1004,16 @@ export function AddOffice() {
               Step {step} of {steps.length}
             </span>
             <button
-              onClick={() =>
-                  step < 4 ? setStep(step + 1) : router.push('/office-registry')
+              onClick={() => {
+                if (step === 3) {
+                  submitOffice();
+                } else if (step === 4) {
+                  router.push('/office-registry');
+                } else {
+                  setStep(step + 1);
                 }
+              }}
+              disabled={isLoading}
               style={{
                 display: 'flex',
                 alignItems: 'center',
@@ -832,7 +1034,12 @@ export function AddOffice() {
               {step === 4 ? (
                 <>
                   <CheckCircle2 size={13} />
-                  Register Office
+                  Finish
+                </>
+              ) : step === 3 ? (
+                <>
+                  {isLoading ? 'Registering...' : 'Register Office'}
+                  {!isLoading && <ChevronRight size={13} />}
                 </>
               ) : (
                 <>

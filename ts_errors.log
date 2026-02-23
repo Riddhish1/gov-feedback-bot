@@ -1,0 +1,10 @@
+lib/flowHandlers.ts(35,23): error TS2339: Property 'office_rating' does not exist on type 'IAnswers'.
+lib/flowHandlers.ts(55,38): error TS2339: Property 'office_rating' does not exist on type 'IAnswers'.
+lib/flowHandlers.ts(60,25): error TS2339: Property 'office_issue' does not exist on type 'IAnswers'.
+lib/flowHandlers.ts(64,25): error TS2339: Property 'office_positive' does not exist on type 'IAnswers'.
+lib/flowHandlers.ts(100,23): error TS2339: Property 'policy_name' does not exist on type 'IAnswers'.
+lib/flowHandlers.ts(111,23): error TS2339: Property 'policy_improvement_type' does not exist on type 'IAnswers'.
+lib/flowHandlers.ts(123,23): error TS2339: Property 'policy_beneficiary' does not exist on type 'IAnswers'.
+lib/flowHandlers.ts(158,23): error TS2339: Property 'process_name' does not exist on type 'IAnswers'.
+lib/flowHandlers.ts(169,23): error TS2339: Property 'process_difficulty' does not exist on type 'IAnswers'.
+lib/flowHandlers.ts(188,23): error TS2551: Property 'process_suggestion' does not exist on type 'IAnswers'. Did you mean 'policy_suggestion'?

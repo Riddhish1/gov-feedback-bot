@@ -58,4 +58,40 @@ export const QUESTIONS = {
    */
   ERROR:
     "⚠️ Something went wrong on our end. Please try again or scan the QR code to restart.",
+  INVALID_OPTION: "⚠️ Invalid option selected.",
+  OFFICE_ISSUE: "Please select an issue type.",
+  OFFICE_POSITIVE: "Please select what you liked.",
+  FINAL_OFFICE: "Thank you for your office feedback.",
+  POLICY_IMPROVEMENT: "What kind of improvement?",
+  POLICY_BENEFICIARY: "Who is the primary beneficiary?",
+  FINAL_POLICY: "Thank you for your policy feedback.",
+  PROCESS_DIFFICULTY: "What was the difficulty?",
+  PROCESS_SUGGESTION: "What is your suggestion?",
+  FINAL_PROCESS: "Thank you for your process feedback.",
 } as const;
+
+export const OFFICE_ISSUES: Record<string, string> = {
+  "1": "Delay",
+  "2": "Bribery",
+  "3": "Staff Behavior",
+};
+
+export const OFFICE_POSITIVES: Record<string, string> = {
+  "1": "Fast Service",
+  "2": "Helpful Staff",
+};
+
+export const POLICY_IMPROVEMENTS: Record<string, string> = {
+  "1": "Change rule",
+  "2": "Better funding",
+};
+
+export const POLICY_BENEFICIARIES: Record<string, string> = {
+  "1": "Farmers",
+  "2": "Students",
+};
+
+export const PROCESS_DIFFICULTIES: Record<string, string> = {
+  "1": "Too much paperwork",
+  "2": "Long wait time",
+};
