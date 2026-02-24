@@ -110,7 +110,7 @@ function KPICard({ label, value, micro, microPositive = true, sub, sparkData, sp
     <div
       style={{
         background: C.white,
-        border: `1.5px solid ${C.border}`,
+        border: '1px solid #000000',
         borderRadius: '14px',
         padding: '24px',
         flex: 1,
@@ -819,7 +819,7 @@ export function Overview() {
               display: 'grid',
               gridTemplateColumns: '2.5fr 1fr 1fr 1.1fr 2fr',
               padding: '16px 28px',
-              borderBottom: idx < offices.length - 1 ? `1px solid ${C.borderLight}` : 'none',
+              borderBottom: idx < offices.length - 1 ? '1px solid #000000' : 'none',
               cursor: 'pointer',
               transition: 'background 0.12s ease',
               alignItems: 'center',

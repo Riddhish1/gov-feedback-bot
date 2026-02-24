@@ -514,7 +514,7 @@ export function OfficeRegistry() {
                 display: 'grid',
                 gridTemplateColumns: '2.5fr 1fr 1fr 1fr 1fr 1fr 1fr',
                 padding: '14px 24px',
-                borderBottom: idx < offices.length - 1 ? `1px solid ${C.borderLight}` : 'none',
+                borderBottom: idx < offices.length - 1 ? '1px solid #000000' : 'none',
                 alignItems: 'center',
                 transition: 'background 0.1s',
                 cursor: 'pointer',

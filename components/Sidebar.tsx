@@ -84,7 +84,7 @@ export function Sidebar() {
             marginBottom: '8px',
           }}
         >
-          Administrative Context
+          ACCESS LEVEL
         </div>
         <div
           style={{

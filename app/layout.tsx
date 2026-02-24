@@ -16,6 +16,9 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "MahaGov Response | AI Executive Dashboard",
   description: "Real-time citizen feedback analytics & governance intelligence for Maharashtra.",
+  icons: {
+    icon: "/logo.jpg",
+  },
 };
 
 export default function RootLayout({
