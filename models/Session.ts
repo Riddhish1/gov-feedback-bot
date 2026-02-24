@@ -31,12 +31,22 @@ export interface IAnswers {
   process_suggestion?: string | null;
 }
 
+export interface IAIAnalysis {
+  sentiment: "Positive" | "Neutral" | "Negative" | null;
+  confidence: number | null;
+  themes: string[];
+  translated_text: string | null;
+  keywords: string[];
+  reform_recommendation: string | null;
+}
+
 export interface ISession extends Document {
   phone: string;
   office_id: string;
   office_name: string;
   current_step: SessionStep;
   answers: IAnswers;
+  ai_analysis?: IAIAnalysis;
   completed: boolean;
   created_at: Date;
   updated_at: Date;
@@ -63,6 +73,18 @@ const AnswersSchema = new Schema<IAnswers>(
     process_suggestion: { type: String, default: null, trim: true },
   },
   { _id: false } // no separate _id for the embedded document
+);
+
+const AIAnalysisSchema = new Schema<IAIAnalysis>(
+  {
+    sentiment: { type: String, enum: ["Positive", "Neutral", "Negative"], default: null },
+    confidence: { type: Number, default: null },
+    themes: { type: [String], default: [] },
+    translated_text: { type: String, default: null },
+    keywords: { type: [String], default: [] },
+    reform_recommendation: { type: String, default: null },
+  },
+  { _id: false }
 );
 
 // ── Main Session schema ───────────────────────────────────────────────────────
@@ -109,6 +131,17 @@ const SessionSchema = new Schema<ISession>(
         process_name: null,
         process_difficulty: null,
         process_suggestion: null,
+      }),
+    },
+    ai_analysis: {
+      type: AIAnalysisSchema,
+      default: () => ({
+        sentiment: null,
+        confidence: null,
+        themes: [],
+        translated_text: null,
+        keywords: [],
+        reform_recommendation: null,
       }),
     },
     completed: {

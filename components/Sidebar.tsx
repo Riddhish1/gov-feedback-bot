@@ -2,13 +2,14 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { LayoutDashboard, BrainCircuit, Building2, BookOpen } from 'lucide-react';
+import { LayoutDashboard, BrainCircuit, Building2, BookOpen, MessageSquareWarning } from 'lucide-react';
 
 const navItems = [
   { path: '/', icon: LayoutDashboard, label: 'Overview' },
   { path: '/governance', icon: BrainCircuit, label: 'Governance Intelligence' },
   { path: '/add-office', icon: Building2, label: 'Add New Office' },
   { path: '/office-registry', icon: BookOpen, label: 'Full Office Registry' },
+  { path: '/feedback', icon: MessageSquareWarning, label: 'Live AI Feed' },
 ];
 
 export function Sidebar() {
@@ -68,7 +69,7 @@ export function Sidebar() {
         </div>
 
         {/* WhatsApp indicator */}
-        
+
       </div>
 
       {/* Context Badge */}

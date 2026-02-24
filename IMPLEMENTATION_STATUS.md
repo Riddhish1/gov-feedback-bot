@@ -113,16 +113,16 @@ This document maps the client requirements from `task.md` against the current im
 - Timestamp (created_at, updated_at)
 - Flow type
 - Structured answers per flow
+- **Department mapping** (added to Office model)
+- **Division mapping** (added to Office model)
+- **Guardian Secretary mapping** (added to Office model)
+- **Advanced Metadata** (stats, OMES, logic mapping)
 
 #### ❌ Missing
 - **Geo-location** (with consent)
 - **Submission ID** (unique reference for citizen)
-- **Department mapping** (not in Office model)
-- **Division mapping** (not in Office model)
-- **Guardian Secretary mapping** (not in Office model)
 
 **Required Action:**
-- Extend `Office` model with hierarchical fields
 - Add geo-location consent and capture
 - Generate unique submission IDs
 
@@ -436,21 +436,9 @@ This document maps the client requirements from `task.md` against the current im
 
 ### Immediate Actions Required
 
-1. **Extend Office Model**
-   ```typescript
-   {
-     office_id: string,
-     office_name: string,
-     district: string,
-     division: string,
-     state: string,
-     department: string,
-     guardian_secretary: string,
-     office_head_contact: string,
-     collector_contact: string,
-     divisional_commissioner_contact: string
-   }
-   ```
+1. **Extend Office Model** (✅ Completed)
+   - Expanded the `IOffice` backend schema successfully.
+   - Configured robust MongoDB caching validation to support field mapping correctly.
 
 2. **Add Submission ID**
    - Generate unique reference (e.g., `MH-PUN-1023-20250222-001`)

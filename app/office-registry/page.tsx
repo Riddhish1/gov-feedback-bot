@@ -128,6 +128,46 @@ function OfficeDrawer({ office, onClose }: { office: any | null; onClose: () => 
               </div>
             </div>
 
+            {/* Live Insights AI Block */}
+            <div style={{ padding: '0 28px' }}>
+              <div style={{ background: '#F8FAFC', borderRadius: '12px', border: `1px solid ${C.border}`, padding: '16px', marginTop: '16px' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+                  <h4 style={{ fontSize: '13px', fontWeight: '640', color: C.text, textTransform: 'uppercase', letterSpacing: '0.04em' }}>Live AI Insights</h4>
+                  <span style={{ fontSize: '11px', fontWeight: '600', color: '#15803D', background: '#DCFCE7', padding: '2px 8px', borderRadius: '20px' }}>
+                    {office.metadata?.confidence || 'N/A'} Confidence
+                  </span>
+                </div>
+
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '16px' }}>
+                  <div style={{ background: C.white, padding: '12px', borderRadius: '8px', border: `1px solid ${C.border}` }}>
+                    <div style={{ fontSize: '11px', color: C.textSec, marginBottom: '4px' }}>OMES SCORE</div>
+                    <div style={{ fontSize: '20px', fontWeight: '700', color: C.text }}>{office.metadata?.omes?.toFixed(2) || 'N/A'}</div>
+                  </div>
+                  <div style={{ background: C.white, padding: '12px', borderRadius: '8px', border: `1px solid ${C.border}` }}>
+                    <div style={{ fontSize: '11px', color: C.textSec, marginBottom: '4px' }}>TRAJECTORY</div>
+                    <div style={{ fontSize: '14px', fontWeight: '600', color: office.metadata?.trend === 'declining' ? '#B91C1C' : '#15803D', textTransform: 'capitalize' }}>
+                      {office.metadata?.trend || 'Stable'}
+                    </div>
+                  </div>
+                </div>
+
+                <div>
+                  <div style={{ fontSize: '11px', color: C.textSec, marginBottom: '8px' }}>DETECTED THEMES</div>
+                  <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
+                    {office.metadata?.themes?.length > 0 ? (
+                      office.metadata.themes.map((t: string) => (
+                        <span key={t} style={{ fontSize: '11px', background: C.white, border: `1px solid ${C.border}`, padding: '4px 10px', borderRadius: '6px', color: C.text }}>
+                          {t}
+                        </span>
+                      ))
+                    ) : (
+                      <span style={{ fontSize: '11px', color: C.textSec }}>No themes detected yet</span>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+
             {/* QR Section */}
             <div style={{ padding: '32px 28px', flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
               <div style={{ marginBottom: '20px', textAlign: 'center' }}>
@@ -282,7 +322,7 @@ export function OfficeRegistry() {
     : 0;
 
   const improvingPct = offices.length
-    ? Math.round((offices.filter((o) => (o.metrics?.trend || 'stable') === 'improving').length / offices.length) * 100)
+    ? Math.round((offices.filter((o) => (o.metadata?.trend || 'stable') === 'improving').length / offices.length) * 100)
     : 0;
 
   const underReviewCount = offices.filter((o) => !o.is_active).length;
@@ -507,27 +547,28 @@ export function OfficeRegistry() {
 
               <div>
                 <span style={{ fontSize: '14px', fontWeight: '640', color: C.text, letterSpacing: '-0.3px' }}>
-                  {office.metrics?.omes ? office.metrics.omes.toFixed(2) : 'N/A'}
+                  {office.metadata?.omes ? office.metadata.omes.toFixed(2) : 'N/A'}
                 </span>
-                {office.metrics?.omes && (
+                {office.metadata?.omes && (
                   <div style={{ height: '2.5px', background: C.border, borderRadius: '2px', marginTop: '5px', width: '40px', overflow: 'hidden' }}>
-                    <div style={{ height: '100%', width: `${(office.metrics.omes / 5) * 100}%`, background: C.blue, borderRadius: '2px', opacity: 0.6 }} />
+                    <div style={{ height: '100%', width: `${(office.metadata.omes / 5) * 100}%`, background: C.blue, borderRadius: '2px', opacity: 0.6 }} />
                   </div>
                 )}
               </div>
 
               <div>
-                {office.metrics?.trend === 'improving' ? (
+                {office.metadata?.trend === 'improving' ? (
                   <span
                     style={{
                       display: 'inline-flex', alignItems: 'center', gap: '4px',
                       padding: '3px 9px', background: '#F0FDF4', color: '#15803D',
                       borderRadius: '20px', fontSize: '11px', fontWeight: '520',
+
                     }}
                   >
                     <TrendingUp size={9} /> Improving
                   </span>
-                ) : office.metrics?.trend === 'declining' ? (
+                ) : office.metadata?.trend === 'declining' ? (
                   <span
                     style={{
                       display: 'inline-flex', alignItems: 'center', gap: '4px',

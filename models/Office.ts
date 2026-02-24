@@ -97,7 +97,7 @@ const OfficeSchema = new Schema<IOffice>(
 
 // ── Model (singleton-safe for Next.js hot reload) ─────────────────────────────
 
-delete mongoose.models.Office;
-const Office: Model<IOffice> = mongoose.model<IOffice>("Office", OfficeSchema);
+const Office: Model<IOffice> =
+  mongoose.models.Office ?? mongoose.model<IOffice>("Office", OfficeSchema);
 
 export default Office;

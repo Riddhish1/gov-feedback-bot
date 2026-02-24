@@ -4,6 +4,7 @@ import twilio from "twilio";
 import { connectDB } from "@/lib/db";
 import { QUESTIONS } from "@/lib/questions";
 import { handleOfficeFlow, handlePolicyFlow, handleProcessFlow } from "@/lib/flowHandlers";
+import { processSessionWithAI } from "@/lib/ai";
 import Office from "@/models/Office";
 import Session from "@/models/Session";
 
@@ -213,6 +214,16 @@ export async function POST(request: NextRequest): Promise<Response> {
         session.completed = true;
       }
       await session.save();
+
+      // Launch async AI sentiment extraction completely independent of the WhatsApp Twilio loop so timeout never hits
+      if (flowRes.completed) {
+        processSessionWithAI(
+          session._id.toString(),
+          session.office_id,
+          session.answers,
+          session.answers.flow_choice
+        ).catch((err) => console.error("Async AI Error tracking", err));
+      }
 
       return twimlResponse(flowRes.message);
     }

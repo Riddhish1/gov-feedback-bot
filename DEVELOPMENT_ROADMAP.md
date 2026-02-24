@@ -36,11 +36,11 @@
 
 ### 🔄 Phase 2: Data Foundation (IN PROGRESS - RECOMMENDED NEXT)
 **Duration:** 4-6 weeks  
-**Status:** 0% Done  
+**Status:** 25% Done  
 **Priority:** HIGH
 
 **Deliverables:**
-- [ ] Extend Office model with hierarchy (department, division, guardian secretary)
+- [x] Extend Office model with hierarchy (department, division, guardian secretary)
 - [ ] Add submission ID generation
 - [ ] Implement geo-location capture (with consent)
 - [ ] DPDP compliance framework
