@@ -12,7 +12,7 @@ const C = {
   bg: '#F7F9FB',
   white: '#FFFFFF',
   text: '#0F1724',
-  textSec: '#5B6472',
+  textSec: '#334155',
   border: '#E8EDF3',
   borderLight: '#F0F4F8',
   shadow: '0 1px 4px rgba(15,23,36,0.06), 0 1px 2px rgba(15,23,36,0.04)',
@@ -62,7 +62,7 @@ function Field({
     <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
       <label
         style={{
-          fontSize: '12.5px',
+          fontSize: '14.5px',
           fontWeight: '560',
           color: C.text,
           letterSpacing: '-0.1px',
@@ -81,7 +81,7 @@ function Field({
           background: C.bg,
           border: `1px solid ${C.border}`,
           borderRadius: '9px',
-          fontSize: '13.5px',
+          fontSize: '15.5px',
           color: C.text,
           outline: 'none',
           fontFamily: 'inherit',
@@ -91,7 +91,7 @@ function Field({
         onFocus={(e) => (e.target.style.borderColor = C.blue)}
         onBlur={(e) => (e.target.style.borderColor = C.border)}
       />
-      {hint && <span style={{ fontSize: '11.5px', color: C.textSec }}>{hint}</span>}
+      {hint && <span style={{ fontSize: '13.5px', color: C.textSec }}>{hint}</span>}
     </div>
   );
 }
@@ -114,7 +114,7 @@ function ComboboxField({
   const listId = `list-${label.replace(/\s+/g, '-')}`;
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-      <label style={{ fontSize: '12.5px', fontWeight: '560', color: C.text, letterSpacing: '-0.1px' }}>
+      <label style={{ fontSize: '14.5px', fontWeight: '560', color: C.text, letterSpacing: '-0.1px' }}>
         {label}
         {required && <span style={{ color: '#E11D48', marginLeft: '3px' }}>*</span>}
       </label>
@@ -128,7 +128,7 @@ function ComboboxField({
           background: C.bg,
           border: `1px solid ${C.border}`,
           borderRadius: '9px',
-          fontSize: '13.5px',
+          fontSize: '15.5px',
           color: C.text,
           outline: 'none',
           fontFamily: 'inherit',
@@ -160,7 +160,7 @@ function SelectField({
 }) {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-      <label style={{ fontSize: '12.5px', fontWeight: '560', color: C.text, letterSpacing: '-0.1px' }}>
+      <label style={{ fontSize: '14.5px', fontWeight: '560', color: C.text, letterSpacing: '-0.1px' }}>
         {label}
       </label>
       <select
@@ -171,7 +171,7 @@ function SelectField({
           background: C.bg,
           border: `1px solid ${C.border}`,
           borderRadius: '9px',
-          fontSize: '13.5px',
+          fontSize: '15.5px',
           color: value ? C.text : C.textSec,
           outline: 'none',
           fontFamily: 'inherit',
@@ -307,9 +307,9 @@ export function AddOffice() {
       {/* Header */}
       <div style={{ marginBottom: '36px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
-          <span style={{ fontSize: '12px', color: C.textSec }}>Maharashtra</span>
+          <span style={{ fontSize: '14px', color: C.textSec }}>Maharashtra</span>
           <span style={{ color: C.border }}>›</span>
-          <span style={{ fontSize: '12px', color: C.blue, fontWeight: '500' }}>Add New Office</span>
+          <span style={{ fontSize: '14px', color: C.blue, fontWeight: '500' }}>Add New Office</span>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
           <div
@@ -327,10 +327,10 @@ export function AddOffice() {
             <Building2 size={18} color={C.blue} />
           </div>
           <div>
-            <h1 style={{ fontSize: '24px', fontWeight: '680', color: C.text, letterSpacing: '-0.5px', marginBottom: '4px' }}>
+            <h1 style={{ fontSize: '26px', fontWeight: '680', color: C.text, letterSpacing: '-0.5px', marginBottom: '4px' }}>
               Register New Office
             </h1>
-            <p style={{ fontSize: '13.5px', color: C.textSec }}>
+            <p style={{ fontSize: '15.5px', color: C.textSec }}>
               Add an office to the GovIntel governance monitoring network
             </p>
           </div>
@@ -360,7 +360,7 @@ export function AddOffice() {
                   height: '28px',
                   borderRadius: '50%',
                   background: step > s.id ? C.green : step === s.id ? C.blue : C.bg,
-                  border: `1.5px solid ${step > s.id ? C.green : step === s.id ? C.blue : C.border}`,
+                  border: `2px solid ${step > s.id ? C.green : step === s.id ? C.blue : C.border}`,
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
@@ -373,7 +373,7 @@ export function AddOffice() {
                 ) : (
                   <span
                     style={{
-                      fontSize: '12px',
+                      fontSize: '14px',
                       fontWeight: '600',
                       color: step === s.id ? 'white' : C.textSec,
                     }}
@@ -384,7 +384,7 @@ export function AddOffice() {
               </div>
               <span
                 style={{
-                  fontSize: '12.5px',
+                  fontSize: '14.5px',
                   fontWeight: step === s.id ? '580' : '420',
                   color: step === s.id ? C.text : C.textSec,
                   whiteSpace: 'nowrap',
@@ -430,10 +430,10 @@ export function AddOffice() {
               style={{ padding: '32px' }}
             >
               <div style={{ marginBottom: '24px' }}>
-                <div style={{ fontSize: '15px', fontWeight: '640', color: C.text, letterSpacing: '-0.3px', marginBottom: '4px' }}>
+                <div style={{ fontSize: '17px', fontWeight: '640', color: C.text, letterSpacing: '-0.3px', marginBottom: '4px' }}>
                   Office Details
                 </div>
-                <div style={{ fontSize: '12.5px', color: C.textSec }}>
+                <div style={{ fontSize: '14.5px', color: C.textSec }}>
                   Basic identification and classification information
                 </div>
               </div>
@@ -488,7 +488,7 @@ export function AddOffice() {
                       background: C.white,
                       border: `1px solid ${C.border}`,
                       borderRadius: '9px',
-                      fontSize: '13px',
+                      fontSize: '15px',
                       color: C.textSec,
                       cursor: 'pointer',
                       display: 'flex',
@@ -503,7 +503,7 @@ export function AddOffice() {
 
               {/* Hierarchy Contacts Section */}
               <div style={{ marginTop: '32px' }}>
-                <div style={{ fontSize: '14px', fontWeight: '640', color: C.text, letterSpacing: '-0.3px', marginBottom: '16px' }}>
+                <div style={{ fontSize: '16px', fontWeight: '640', color: C.text, letterSpacing: '-0.3px', marginBottom: '16px' }}>
                   Hierarchy & Contacts
                 </div>
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '18px' }}>
@@ -516,7 +516,7 @@ export function AddOffice() {
                   <div style={{ gridColumn: '1 / -1', borderTop: `1px dashed ${C.border}`, margin: '8px 0' }} />
 
                   {/* Office Head Contact */}
-                  <div style={{ gridColumn: '1 / -1', fontSize: '12.5px', fontWeight: '560', color: C.textSec }}>
+                  <div style={{ gridColumn: '1 / -1', fontSize: '14.5px', fontWeight: '560', color: C.textSec }}>
                     Office Head Contact
                   </div>
                   <Field label="Name" value={form.officeHeadName} onChange={set('officeHeadName')} placeholder="Officer Name" />
@@ -528,7 +528,7 @@ export function AddOffice() {
                   <div style={{ gridColumn: '1 / -1', borderTop: `1px dashed ${C.border}`, margin: '8px 0' }} />
 
                   {/* Collector Contact */}
-                  <div style={{ gridColumn: '1 / -1', fontSize: '12.5px', fontWeight: '560', color: C.textSec }}>
+                  <div style={{ gridColumn: '1 / -1', fontSize: '14.5px', fontWeight: '560', color: C.textSec }}>
                     Collector Contact
                   </div>
                   <Field label="Name" value={form.collectorName} onChange={set('collectorName')} placeholder="Collector Name" />
@@ -540,7 +540,7 @@ export function AddOffice() {
                   <div style={{ gridColumn: '1 / -1', borderTop: `1px dashed ${C.border}`, margin: '8px 0' }} />
 
                   {/* Divisional Commissioner Contact */}
-                  <div style={{ gridColumn: '1 / -1', fontSize: '12.5px', fontWeight: '560', color: C.textSec }}>
+                  <div style={{ gridColumn: '1 / -1', fontSize: '14.5px', fontWeight: '560', color: C.textSec }}>
                     Divisional Commissioner Contact
                   </div>
                   <Field label="Name" value={form.divCommName} onChange={set('divCommName')} placeholder="Commissioner Name" />
@@ -564,10 +564,10 @@ export function AddOffice() {
               style={{ padding: '32px' }}
             >
               <div style={{ marginBottom: '24px' }}>
-                <div style={{ fontSize: '15px', fontWeight: '640', color: C.text, letterSpacing: '-0.3px', marginBottom: '4px' }}>
+                <div style={{ fontSize: '17px', fontWeight: '640', color: C.text, letterSpacing: '-0.3px', marginBottom: '4px' }}>
                   Office Identifiers
                 </div>
-                <div style={{ fontSize: '12.5px', color: C.textSec }}>
+                <div style={{ fontSize: '14.5px', color: C.textSec }}>
                   Unique codes assigned to this office in state systems
                 </div>
               </div>
@@ -601,10 +601,10 @@ export function AddOffice() {
                   >
                     <CheckCircle2 size={15} color={C.blue} />
                     <div style={{ flex: 1 }}>
-                      <div style={{ fontSize: '12.5px', fontWeight: '540', color: C.blue, marginBottom: '2px' }}>
+                      <div style={{ fontSize: '14.5px', fontWeight: '540', color: C.blue, marginBottom: '2px' }}>
                         Identifier Format Valid
                       </div>
-                      <div style={{ fontSize: '11.5px', color: '#1E4DA0' }}>
+                      <div style={{ fontSize: '13.5px', color: '#1E4DA0' }}>
                         DIGIPIN {form.digipin} · Treasury {form.treasuryCode}
                       </div>
                     </div>
@@ -624,17 +624,17 @@ export function AddOffice() {
               style={{ padding: '32px' }}
             >
               <div style={{ marginBottom: '24px' }}>
-                <div style={{ fontSize: '15px', fontWeight: '640', color: C.text, letterSpacing: '-0.3px', marginBottom: '4px' }}>
+                <div style={{ fontSize: '17px', fontWeight: '640', color: C.text, letterSpacing: '-0.3px', marginBottom: '4px' }}>
                   Services & Operations
                 </div>
-                <div style={{ fontSize: '12.5px', color: C.textSec }}>
+                <div style={{ fontSize: '14.5px', color: C.textSec }}>
                   Services offered and operational parameters
                 </div>
               </div>
 
               {/* Services */}
               <div style={{ marginBottom: '24px' }}>
-                <div style={{ fontSize: '12.5px', fontWeight: '560', color: C.text, marginBottom: '10px', letterSpacing: '-0.1px' }}>
+                <div style={{ fontSize: '14.5px', fontWeight: '560', color: C.text, marginBottom: '10px', letterSpacing: '-0.1px' }}>
                   Services Offered
                 </div>
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
@@ -647,7 +647,7 @@ export function AddOffice() {
                         background: form.services.includes(s) ? C.blue : C.bg,
                         border: `1px solid ${form.services.includes(s) ? C.blue : C.border}`,
                         borderRadius: '8px',
-                        fontSize: '12.5px',
+                        fontSize: '14.5px',
                         color: form.services.includes(s) ? 'white' : C.text,
                         cursor: 'pointer',
                         fontFamily: 'inherit',
@@ -673,7 +673,7 @@ export function AddOffice() {
                   type="number"
                 />
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                  <label style={{ fontSize: '12.5px', fontWeight: '560', color: C.text, letterSpacing: '-0.1px' }}>
+                  <label style={{ fontSize: '14.5px', fontWeight: '560', color: C.text, letterSpacing: '-0.1px' }}>
                     Working Hours
                   </label>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
@@ -687,13 +687,13 @@ export function AddOffice() {
                         background: C.bg,
                         border: `1px solid ${C.border}`,
                         borderRadius: '9px',
-                        fontSize: '13.5px',
+                        fontSize: '15.5px',
                         color: C.text,
                         outline: 'none',
                         fontFamily: 'inherit',
                       }}
                     />
-                    <span style={{ fontSize: '12px', color: C.textSec }}>to</span>
+                    <span style={{ fontSize: '14px', color: C.textSec }}>to</span>
                     <input
                       type="time"
                       value={form.workingHoursTo}
@@ -704,7 +704,7 @@ export function AddOffice() {
                         background: C.bg,
                         border: `1px solid ${C.border}`,
                         borderRadius: '9px',
-                        fontSize: '13.5px',
+                        fontSize: '15.5px',
                         color: C.text,
                         outline: 'none',
                         fontFamily: 'inherit',
@@ -719,7 +719,7 @@ export function AddOffice() {
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px', gridColumn: '1 / -1' }}>
                   <input type="checkbox" checked={form.isActive} onChange={(e) => setForm(f => ({ ...f, isActive: e.target.checked }))} id="isActiveCheck" style={{ cursor: 'pointer' }} />
-                  <label htmlFor="isActiveCheck" style={{ fontSize: '13px', color: C.text, cursor: 'pointer' }}>Active Office (Receiving Feedback)</label>
+                  <label htmlFor="isActiveCheck" style={{ fontSize: '15px', color: C.text, cursor: 'pointer' }}>Active Office (Receiving Feedback)</label>
                 </div>
               </div>
             </motion.div>
@@ -735,10 +735,10 @@ export function AddOffice() {
               style={{ padding: '32px' }}
             >
               <div style={{ marginBottom: '24px' }}>
-                <div style={{ fontSize: '15px', fontWeight: '640', color: C.text, letterSpacing: '-0.3px', marginBottom: '4px' }}>
+                <div style={{ fontSize: '17px', fontWeight: '640', color: C.text, letterSpacing: '-0.3px', marginBottom: '4px' }}>
                   Review & Registration
                 </div>
-                <div style={{ fontSize: '12.5px', color: C.textSec }}>
+                <div style={{ fontSize: '14.5px', color: C.textSec }}>
                   Confirm office details and generate WhatsApp onboarding QR
                 </div>
               </div>
@@ -759,7 +759,7 @@ export function AddOffice() {
                       style={{
                         padding: '12px 16px',
                         borderBottom: `1px solid ${C.border}`,
-                        fontSize: '12px',
+                        fontSize: '14px',
                         fontWeight: '580',
                         color: C.textSec,
                         textTransform: 'uppercase',
@@ -785,8 +785,8 @@ export function AddOffice() {
                           borderBottom: `1px solid ${C.borderLight}`,
                         }}
                       >
-                        <span style={{ fontSize: '12.5px', color: C.textSec }}>{k}</span>
-                        <span style={{ fontSize: '12.5px', fontWeight: '520', color: C.text }}>{v || '—'}</span>
+                        <span style={{ fontSize: '14.5px', color: C.textSec }}>{k}</span>
+                        <span style={{ fontSize: '14.5px', fontWeight: '520', color: C.text }}>{v || '—'}</span>
                       </div>
                     ))}
                   </div>
@@ -803,7 +803,7 @@ export function AddOffice() {
                       style={{
                         padding: '12px 16px',
                         borderBottom: `1px solid ${C.border}`,
-                        fontSize: '12px',
+                        fontSize: '14px',
                         fontWeight: '580',
                         color: C.textSec,
                         textTransform: 'uppercase',
@@ -828,12 +828,12 @@ export function AddOffice() {
                           borderBottom: `1px solid ${C.borderLight}`,
                         }}
                       >
-                        <span style={{ fontSize: '12.5px', color: C.textSec }}>{k}</span>
-                        <span style={{ fontSize: '12.5px', fontWeight: '520', color: C.text }}>{v || '—'}</span>
+                        <span style={{ fontSize: '14.5px', color: C.textSec }}>{k}</span>
+                        <span style={{ fontSize: '14.5px', fontWeight: '520', color: C.text }}>{v || '—'}</span>
                       </div>
                     ))}
                     <div style={{ padding: '12px 16px' }}>
-                      <span style={{ fontSize: '12.5px', color: C.textSec, display: 'block', marginBottom: '6px' }}>
+                      <span style={{ fontSize: '14.5px', color: C.textSec, display: 'block', marginBottom: '6px' }}>
                         Services
                       </span>
                       <div style={{ display: 'flex', flexWrap: 'wrap', gap: '5px' }}>
@@ -846,7 +846,7 @@ export function AddOffice() {
                               color: C.blue,
                               border: `1px solid ${C.blueMid}`,
                               borderRadius: '20px',
-                              fontSize: '11.5px',
+                              fontSize: '13.5px',
                               fontWeight: '500',
                             }}
                           >
@@ -875,7 +875,7 @@ export function AddOffice() {
                   >
                     <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '4px' }}>
                       <QrCode size={14} color={C.blue} />
-                      <span style={{ fontSize: '12px', fontWeight: '560', color: C.text, letterSpacing: '-0.1px' }}>
+                      <span style={{ fontSize: '14px', fontWeight: '560', color: C.text, letterSpacing: '-0.1px' }}>
                         WhatsApp QR Code
                       </span>
                     </div>
@@ -906,7 +906,7 @@ export function AddOffice() {
                           border: `1px dashed ${C.border}`,
                           borderRadius: '10px',
                           color: C.textSec,
-                          fontSize: '12px',
+                          fontSize: '14px',
                           textAlign: 'center',
                           width: '186px',
                           height: '186px',
@@ -919,10 +919,10 @@ export function AddOffice() {
                       </div>
                     )}
                     <div style={{ textAlign: 'center' }}>
-                      <div style={{ fontSize: '11.5px', fontWeight: '560', color: C.text, marginBottom: '2px' }}>
+                      <div style={{ fontSize: '13.5px', fontWeight: '560', color: C.text, marginBottom: '2px' }}>
                         {form.digipin || '---'}
                       </div>
-                      <div style={{ fontSize: '11px', color: C.textSec }}>Scan to submit feedback</div>
+                      <div style={{ fontSize: '13px', color: C.textSec }}>Scan to submit feedback</div>
                     </div>
                     <button
                       onClick={handleCopy}
@@ -935,7 +935,7 @@ export function AddOffice() {
                         background: !createdOffice ? C.bg : (copied ? C.greenSoft : C.bg),
                         border: `1px solid ${!createdOffice ? C.border : (copied ? C.green : C.border)}`,
                         borderRadius: '8px',
-                        fontSize: '12px',
+                        fontSize: '14px',
                         color: !createdOffice ? C.textSec : (copied ? '#15803D' : C.textSec),
                         cursor: !createdOffice ? 'not-allowed' : 'pointer',
                         opacity: !createdOffice ? 0.6 : 1,
@@ -958,7 +958,7 @@ export function AddOffice() {
                       borderRadius: '10px',
                     }}
                   >
-                    <p style={{ fontSize: '11.5px', color: '#1E4DA0', lineHeight: 1.55 }}>
+                    <p style={{ fontSize: '13.5px', color: '#1E4DA0', lineHeight: 1.55 }}>
                       Citizens can scan this QR to submit experience feedback via WhatsApp.
                     </p>
                   </div>
@@ -989,7 +989,7 @@ export function AddOffice() {
               background: C.white,
               border: `1px solid ${C.border}`,
               borderRadius: '9px',
-              fontSize: '13px',
+              fontSize: '15px',
               color: C.textSec,
               cursor: 'pointer',
               fontFamily: 'inherit',
@@ -1000,7 +1000,7 @@ export function AddOffice() {
           </button>
 
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <span style={{ fontSize: '12px', color: C.textSec }}>
+            <span style={{ fontSize: '14px', color: C.textSec }}>
               Step {step} of {steps.length}
             </span>
             <button
@@ -1022,7 +1022,7 @@ export function AddOffice() {
                 background: C.blue,
                 border: 'none',
                 borderRadius: '9px',
-                fontSize: '13px',
+                fontSize: '15px',
                 fontWeight: '520',
                 color: 'white',
                 cursor: 'pointer',

@@ -6,7 +6,7 @@ import { LayoutDashboard, BrainCircuit, Building2, BookOpen, MessageSquareWarnin
 
 const navItems = [
   { path: '/', icon: LayoutDashboard, label: 'Overview' },
-  { path: '/governance', icon: BrainCircuit, label: 'Governance Intelligence' },
+  // { path: '/governance', icon: BrainCircuit, label: 'Governance Intelligence' },
   { path: '/add-office', icon: Building2, label: 'Add New Office' },
   { path: '/office-registry', icon: BookOpen, label: 'Full Office Registry' },
   { path: '/feedback', icon: MessageSquareWarning, label: 'Live AI Feed' },
@@ -21,7 +21,7 @@ export function Sidebar() {
         width: '244px',
         minWidth: '244px',
         background: '#FFFFFF',
-        borderRight: '1px solid #E8EDF3',
+        borderRight: '2px solid #E8EDF3',
         display: 'flex',
         flexDirection: 'column',
         height: '100vh',

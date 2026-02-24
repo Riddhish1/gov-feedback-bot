@@ -12,7 +12,7 @@ const C = {
   bg: '#F7F9FB',
   white: '#FFFFFF',
   text: '#0F1724',
-  textSec: '#5B6472',
+  textSec: '#334155',
   border: '#E8EDF3',
   borderLight: '#F0F4F8',
   shadow: '0 1px 4px rgba(15,23,36,0.06), 0 1px 2px rgba(15,23,36,0.04)',
@@ -75,7 +75,7 @@ function OfficeDrawer({ office, onClose }: { office: any | null; onClose: () => 
             >
               <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '12px' }}>
                 <div>
-                  <div style={{ fontSize: '18px', fontWeight: '640', color: C.text, letterSpacing: '-0.4px', marginBottom: '6px' }}>
+                  <div style={{ fontSize: '20px', fontWeight: '640', color: C.text, letterSpacing: '-0.4px', marginBottom: '6px' }}>
                     {office.office_name}
                   </div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
@@ -83,7 +83,7 @@ function OfficeDrawer({ office, onClose }: { office: any | null; onClose: () => 
                       style={{
                         background: C.blueSoft,
                         color: C.blue,
-                        fontSize: '11.5px',
+                        fontSize: '13.5px',
                         fontWeight: '520',
                         padding: '3px 10px',
                         borderRadius: '20px',
@@ -96,7 +96,7 @@ function OfficeDrawer({ office, onClose }: { office: any | null; onClose: () => 
                       style={{
                         background: office.is_active ? C.bg : '#FFFBEB',
                         color: office.is_active ? C.textSec : '#92400E',
-                        fontSize: '11.5px',
+                        fontSize: '13.5px',
                         fontWeight: '520',
                         padding: '3px 10px',
                         borderRadius: '20px',
@@ -132,36 +132,36 @@ function OfficeDrawer({ office, onClose }: { office: any | null; onClose: () => 
             <div style={{ padding: '0 28px' }}>
               <div style={{ background: '#F8FAFC', borderRadius: '12px', border: `1px solid ${C.border}`, padding: '16px', marginTop: '16px' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-                  <h4 style={{ fontSize: '13px', fontWeight: '640', color: C.text, textTransform: 'uppercase', letterSpacing: '0.04em' }}>Live AI Insights</h4>
-                  <span style={{ fontSize: '11px', fontWeight: '600', color: '#15803D', background: '#DCFCE7', padding: '2px 8px', borderRadius: '20px' }}>
+                  <h4 style={{ fontSize: '15px', fontWeight: '640', color: C.text, textTransform: 'uppercase', letterSpacing: '0.04em' }}>Live AI Insights</h4>
+                  <span style={{ fontSize: '13px', fontWeight: '600', color: '#15803D', background: '#DCFCE7', padding: '2px 8px', borderRadius: '20px' }}>
                     {office.metadata?.confidence || 'N/A'} Confidence
                   </span>
                 </div>
 
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '16px' }}>
                   <div style={{ background: C.white, padding: '12px', borderRadius: '8px', border: `1px solid ${C.border}` }}>
-                    <div style={{ fontSize: '11px', color: C.textSec, marginBottom: '4px' }}>OMES SCORE</div>
-                    <div style={{ fontSize: '20px', fontWeight: '700', color: C.text }}>{office.metadata?.omes?.toFixed(2) || 'N/A'}</div>
+                    <div style={{ fontSize: '13px', color: C.textSec, marginBottom: '4px' }}>OMES SCORE</div>
+                    <div style={{ fontSize: '22px', fontWeight: '700', color: C.text }}>{office.metadata?.omes?.toFixed(2) || 'N/A'}</div>
                   </div>
                   <div style={{ background: C.white, padding: '12px', borderRadius: '8px', border: `1px solid ${C.border}` }}>
-                    <div style={{ fontSize: '11px', color: C.textSec, marginBottom: '4px' }}>TRAJECTORY</div>
-                    <div style={{ fontSize: '14px', fontWeight: '600', color: office.metadata?.trend === 'declining' ? '#B91C1C' : '#15803D', textTransform: 'capitalize' }}>
+                    <div style={{ fontSize: '13px', color: C.textSec, marginBottom: '4px' }}>TRAJECTORY</div>
+                    <div style={{ fontSize: '16px', fontWeight: '600', color: office.metadata?.trend === 'declining' ? '#B91C1C' : '#15803D', textTransform: 'capitalize' }}>
                       {office.metadata?.trend || 'Stable'}
                     </div>
                   </div>
                 </div>
 
                 <div>
-                  <div style={{ fontSize: '11px', color: C.textSec, marginBottom: '8px' }}>DETECTED THEMES</div>
+                  <div style={{ fontSize: '13px', color: C.textSec, marginBottom: '8px' }}>DETECTED THEMES</div>
                   <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
                     {office.metadata?.themes?.length > 0 ? (
                       office.metadata.themes.map((t: string) => (
-                        <span key={t} style={{ fontSize: '11px', background: C.white, border: `1px solid ${C.border}`, padding: '4px 10px', borderRadius: '6px', color: C.text }}>
+                        <span key={t} style={{ fontSize: '13px', background: C.white, border: `1px solid ${C.border}`, padding: '4px 10px', borderRadius: '6px', color: C.text }}>
                           {t}
                         </span>
                       ))
                     ) : (
-                      <span style={{ fontSize: '11px', color: C.textSec }}>No themes detected yet</span>
+                      <span style={{ fontSize: '13px', color: C.textSec }}>No themes detected yet</span>
                     )}
                   </div>
                 </div>
@@ -185,10 +185,10 @@ function OfficeDrawer({ office, onClose }: { office: any | null; onClose: () => 
                 >
                   <QrCode size={20} color={C.blue} />
                 </div>
-                <h3 style={{ fontSize: '15px', fontWeight: '600', color: C.text, marginBottom: '6px', letterSpacing: '-0.2px' }}>
+                <h3 style={{ fontSize: '17px', fontWeight: '600', color: C.text, marginBottom: '6px', letterSpacing: '-0.2px' }}>
                   Feedback QR Portal
                 </h3>
-                <p style={{ fontSize: '12.5px', color: C.textSec, maxWidth: '260px', lineHeight: 1.5 }}>
+                <p style={{ fontSize: '14.5px', color: C.textSec, maxWidth: '260px', lineHeight: 1.5 }}>
                   Print or display this code at the office to allow citizens to instantly submit secure feedback via WhatsApp.
                 </p>
               </div>
@@ -226,7 +226,7 @@ function OfficeDrawer({ office, onClose }: { office: any | null; onClose: () => 
                   background: copied ? C.greenSoft : C.blue,
                   color: copied ? '#15803D' : 'white',
                   borderRadius: '9px',
-                  fontSize: '13px',
+                  fontSize: '15px',
                   fontWeight: '520',
                   border: `1px solid ${copied ? C.green : C.blue}`,
                   cursor: 'pointer',
@@ -332,16 +332,16 @@ export function OfficeRegistry() {
       {/* Header */}
       <div style={{ marginBottom: '32px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
-          <span style={{ fontSize: '12px', color: C.textSec }}>Maharashtra</span>
+          <span style={{ fontSize: '14px', color: C.textSec }}>Maharashtra</span>
           <span style={{ color: C.border }}>›</span>
-          <span style={{ fontSize: '12px', color: C.blue, fontWeight: '500' }}>Office Registry</span>
+          <span style={{ fontSize: '14px', color: C.blue, fontWeight: '500' }}>Office Registry</span>
         </div>
         <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between' }}>
           <div>
-            <h1 style={{ fontSize: '26px', fontWeight: '680', color: C.text, letterSpacing: '-0.6px', marginBottom: '6px' }}>
+            <h1 style={{ fontSize: '28px', fontWeight: '680', color: C.text, letterSpacing: '-0.6px', marginBottom: '6px' }}>
               Full Office Registry
             </h1>
-            <p style={{ fontSize: '14px', color: C.textSec }}>
+            <p style={{ fontSize: '16px', color: C.textSec }}>
               All registered offices across Maharashtra · {totalOffices} total
             </p>
           </div>
@@ -350,7 +350,7 @@ export function OfficeRegistry() {
               style={{
                 display: 'flex', alignItems: 'center', gap: '7px',
                 padding: '9px 16px', background: C.white, border: `1px solid ${C.border}`,
-                borderRadius: '9px', fontSize: '13px', color: C.textSec, cursor: 'pointer',
+                borderRadius: '9px', fontSize: '15px', color: C.textSec, cursor: 'pointer',
                 fontFamily: 'inherit', boxShadow: C.shadow,
               }}
             >
@@ -362,7 +362,7 @@ export function OfficeRegistry() {
               style={{
                 display: 'flex', alignItems: 'center', gap: '7px',
                 padding: '9px 18px', background: C.blue, border: 'none',
-                borderRadius: '9px', fontSize: '13px', fontWeight: '520', color: 'white',
+                borderRadius: '9px', fontSize: '15px', fontWeight: '520', color: 'white',
                 cursor: 'pointer', fontFamily: 'inherit',
                 boxShadow: '0 2px 8px rgba(11,108,245,0.25)',
               }}
@@ -389,10 +389,10 @@ export function OfficeRegistry() {
               padding: '12px 18px', boxShadow: C.shadow, flex: 1,
             }}
           >
-            <div style={{ fontSize: '11px', color: C.textSec, textTransform: 'uppercase', letterSpacing: '0.07em', marginBottom: '4px' }}>
+            <div style={{ fontSize: '13px', color: C.textSec, textTransform: 'uppercase', letterSpacing: '0.07em', marginBottom: '4px' }}>
               {s.label}
             </div>
-            <div style={{ fontSize: '18px', fontWeight: '660', color: C.text, letterSpacing: '-0.4px' }}>
+            <div style={{ fontSize: '20px', fontWeight: '660', color: C.text, letterSpacing: '-0.4px' }}>
               {s.value}
             </div>
           </div>
@@ -420,7 +420,7 @@ export function OfficeRegistry() {
             placeholder="Search by office name or district…"
             style={{
               flex: 1, border: 'none', outline: 'none', background: 'transparent',
-              fontSize: '13.5px', color: C.text, fontFamily: 'inherit',
+              fontSize: '15.5px', color: C.text, fontFamily: 'inherit',
             }}
           />
         </div>
@@ -434,7 +434,7 @@ export function OfficeRegistry() {
           onChange={(e) => setDivisionFilter(e.target.value)}
           style={{
             padding: '9px 12px', background: C.bg, border: `1px solid ${C.border}`,
-            borderRadius: '9px', fontSize: '13px', color: divisionFilter ? C.text : C.textSec,
+            borderRadius: '9px', fontSize: '15px', color: divisionFilter ? C.text : C.textSec,
             cursor: 'pointer', fontFamily: 'inherit', outline: 'none', minWidth: '140px',
           }}
         >
@@ -447,7 +447,7 @@ export function OfficeRegistry() {
           onChange={(e) => setDeptFilter(e.target.value)}
           style={{
             padding: '9px 12px', background: C.bg, border: `1px solid ${C.border}`,
-            borderRadius: '9px', fontSize: '13px', color: deptFilter ? C.text : C.textSec,
+            borderRadius: '9px', fontSize: '15px', color: deptFilter ? C.text : C.textSec,
             cursor: 'pointer', fontFamily: 'inherit', outline: 'none', minWidth: '140px',
           }}
         >
@@ -459,7 +459,7 @@ export function OfficeRegistry() {
       {/* Table */}
       <div
         style={{
-          background: C.white, border: `1px solid ${C.border}`, borderRadius: '16px',
+          background: C.white, border: `2px solid ${C.border}`, borderRadius: '16px',
           boxShadow: C.shadow, overflow: 'hidden',
         }}
       >
@@ -486,7 +486,7 @@ export function OfficeRegistry() {
               key={label}
               onClick={() => k && handleSort(k)}
               style={{
-                fontSize: '11px', fontWeight: '600', color: C.textSec,
+                fontSize: '13px', fontWeight: '600', color: C.textSec,
                 textTransform: 'uppercase', letterSpacing: '0.07em',
                 cursor: k ? 'pointer' : 'default',
                 display: 'flex', alignItems: 'center', gap: '4px',
@@ -503,7 +503,7 @@ export function OfficeRegistry() {
         {isLoading ? (
           <div style={{ padding: '60px', textAlign: 'center', color: C.textSec, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px' }}>
             <Loader2 size={24} className="animate-spin" color={C.blue} />
-            <span style={{ fontSize: '14px' }}>Loading office registry...</span>
+            <span style={{ fontSize: '16px' }}>Loading office registry...</span>
           </div>
         ) : offices.length > 0 ? (
           offices.map((office, idx) => (
@@ -523,7 +523,7 @@ export function OfficeRegistry() {
               onMouseLeave={(e) => ((e.currentTarget as HTMLDivElement).style.background = 'transparent')}
             >
               <div>
-                <div style={{ fontSize: '13.5px', fontWeight: '520', color: C.text, letterSpacing: '-0.2px', marginBottom: '2px' }}>
+                <div style={{ fontSize: '15.5px', fontWeight: '520', color: C.text, letterSpacing: '-0.2px', marginBottom: '2px' }}>
                   {office.office_name}
                 </div>
                 <span
@@ -532,7 +532,7 @@ export function OfficeRegistry() {
                     background: office.is_active ? C.bg : '#FFFBEB',
                     color: office.is_active ? C.textSec : '#92400E',
                     borderRadius: '20px',
-                    fontSize: '10.5px',
+                    fontSize: '12.5px',
                     fontWeight: '500',
                     border: `1px solid ${office.is_active ? C.border : '#FDE68A'}`,
                   }}
@@ -541,15 +541,15 @@ export function OfficeRegistry() {
                 </span>
               </div>
 
-              <div style={{ fontSize: '12.5px', color: C.textSec }}>{office.department || '---'}</div>
-              <div style={{ fontSize: '12.5px', color: C.text }}>{office.district || '---'}</div>
-              <div style={{ fontSize: '12.5px', color: C.textSec }}>{office.division || '---'}</div>
+              <div style={{ fontSize: '14.5px', color: C.textSec }}>{office.department || '---'}</div>
+              <div style={{ fontSize: '14.5px', color: C.text }}>{office.district || '---'}</div>
+              <div style={{ fontSize: '14.5px', color: C.textSec }}>{office.division || '---'}</div>
 
               <div>
-                <span style={{ fontSize: '14px', fontWeight: '640', color: C.text, letterSpacing: '-0.3px' }}>
-                  {office.metadata?.omes ? office.metadata.omes.toFixed(2) : 'N/A'}
+                <span style={{ fontSize: '16px', fontWeight: '640', color: C.text, letterSpacing: '-0.3px' }}>
+                  {typeof office.metadata?.omes === 'number' ? office.metadata.omes.toFixed(2) : 'N/A'}
                 </span>
-                {office.metadata?.omes && (
+                {typeof office.metadata?.omes === 'number' && office.metadata.omes > 0 && (
                   <div style={{ height: '2.5px', background: C.border, borderRadius: '2px', marginTop: '5px', width: '40px', overflow: 'hidden' }}>
                     <div style={{ height: '100%', width: `${(office.metadata.omes / 5) * 100}%`, background: C.blue, borderRadius: '2px', opacity: 0.6 }} />
                   </div>
@@ -562,7 +562,7 @@ export function OfficeRegistry() {
                     style={{
                       display: 'inline-flex', alignItems: 'center', gap: '4px',
                       padding: '3px 9px', background: '#F0FDF4', color: '#15803D',
-                      borderRadius: '20px', fontSize: '11px', fontWeight: '520',
+                      borderRadius: '20px', fontSize: '13px', fontWeight: '520',
 
                     }}
                   >
@@ -573,7 +573,7 @@ export function OfficeRegistry() {
                     style={{
                       display: 'inline-flex', alignItems: 'center', gap: '4px',
                       padding: '3px 9px', background: '#FEF2F2', color: '#B91C1C',
-                      borderRadius: '20px', fontSize: '11px', fontWeight: '520',
+                      borderRadius: '20px', fontSize: '13px', fontWeight: '520',
                       border: `1px solid #FCA5A5`,
                     }}
                   >
@@ -584,7 +584,7 @@ export function OfficeRegistry() {
                     style={{
                       display: 'inline-flex', alignItems: 'center', gap: '4px',
                       padding: '3px 9px', background: C.bg, color: C.textSec,
-                      borderRadius: '20px', fontSize: '11px', fontWeight: '520',
+                      borderRadius: '20px', fontSize: '13px', fontWeight: '520',
                       border: `1px solid ${C.border}`,
                     }}
                   >
@@ -593,12 +593,12 @@ export function OfficeRegistry() {
                 )}
               </div>
 
-              <div style={{ fontSize: '13px', fontWeight: '520', color: C.text }}>
+              <div style={{ fontSize: '15px', fontWeight: '520', color: C.text }}>
                 {office.expected_visitors ? office.expected_visitors.toLocaleString() : '---'}
               </div>
             </div>
           ))) : (
-          <div style={{ padding: '48px', textAlign: 'center', color: C.textSec, fontSize: '14px' }}>
+          <div style={{ padding: '48px', textAlign: 'center', color: C.textSec, fontSize: '16px' }}>
             No offices match your current filters.
           </div>
         )}
@@ -610,7 +610,7 @@ export function OfficeRegistry() {
             display: 'flex', alignItems: 'center', justifyContent: 'space-between',
           }}
         >
-          <span style={{ fontSize: '12px', color: C.textSec }}>
+          <span style={{ fontSize: '14px', color: C.textSec }}>
             Showing {offices.length} of {totalOffices} registered offices
           </span>
           {totalPages > 1 && (
@@ -624,7 +624,7 @@ export function OfficeRegistry() {
                     border: `1px solid ${p === page ? C.blue : C.border}`,
                     background: p === page ? C.blue : C.white,
                     color: p === page ? 'white' : C.textSec,
-                    fontSize: '12px', cursor: 'pointer', fontFamily: 'inherit',
+                    fontSize: '14px', cursor: 'pointer', fontFamily: 'inherit',
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
                     transition: 'all 0.15s'
                   }}

@@ -23,7 +23,7 @@ const C = {
   bg: '#F7F9FB',
   white: '#FFFFFF',
   text: '#0F1724',
-  textSec: '#5B6472',
+  textSec: '#334155',
   border: '#E8EDF3',
   borderLight: '#F0F4F8',
   shadow: '0 1px 4px rgba(15,23,36,0.06), 0 1px 2px rgba(15,23,36,0.04)',
@@ -118,9 +118,9 @@ export function GovernanceIntelligence() {
       {/* Header */}
       <div style={{ marginBottom: '36px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
-          <span style={{ fontSize: '12px', color: C.textSec }}>Maharashtra</span>
+          <span style={{ fontSize: '14px', color: C.textSec }}>Maharashtra</span>
           <span style={{ color: C.border }}>›</span>
-          <span style={{ fontSize: '12px', color: C.blue, fontWeight: '500' }}>
+          <span style={{ fontSize: '14px', color: C.blue, fontWeight: '500' }}>
             Governance Intelligence
           </span>
         </div>
@@ -128,7 +128,7 @@ export function GovernanceIntelligence() {
           <div>
             <h1
               style={{
-                fontSize: '26px',
+                fontSize: '28px',
                 fontWeight: '680',
                 color: C.text,
                 letterSpacing: '-0.6px',
@@ -137,7 +137,7 @@ export function GovernanceIntelligence() {
             >
               Governance Intelligence
             </h1>
-            <p style={{ fontSize: '14px', color: C.textSec }}>
+            <p style={{ fontSize: '16px', color: C.textSec }}>
               AI-advisory pattern analysis · Not prescriptive, not punitive
             </p>
           </div>
@@ -170,10 +170,10 @@ export function GovernanceIntelligence() {
             >
               
               <div>
-                <div style={{ fontSize: '14px', fontWeight: '620', color: C.text, letterSpacing: '-0.2px' }}>
+                <div style={{ fontSize: '16px', fontWeight: '620', color: C.text, letterSpacing: '-0.2px' }}>
                   Intelligence Query
                 </div>
-                <div style={{ fontSize: '11.5px', color: C.textSec }}>
+                <div style={{ fontSize: '13.5px', color: C.textSec }}>
                   Explore patterns across submissions, OMES trends & governance themes
                 </div>
               </div>
@@ -201,7 +201,7 @@ export function GovernanceIntelligence() {
                     border: 'none',
                     outline: 'none',
                     background: 'transparent',
-                    fontSize: '14px',
+                    fontSize: '16px',
                     color: C.text,
                     letterSpacing: '-0.1px',
                     lineHeight: 1.6,
@@ -222,7 +222,7 @@ export function GovernanceIntelligence() {
                         color: C.blue,
                         border: `1px solid ${C.blueMid}`,
                         borderRadius: '20px',
-                        fontSize: '11.5px',
+                        fontSize: '13.5px',
                         fontWeight: '500',
                       }}
                     >
@@ -242,7 +242,7 @@ export function GovernanceIntelligence() {
                     border: 'none',
                     borderRadius: '10px',
                     color: 'white',
-                    fontSize: '13.5px',
+                    fontSize: '15.5px',
                     fontWeight: '530',
                     cursor: loading || !query.trim() ? 'default' : 'pointer',
                     fontFamily: 'inherit',
@@ -303,7 +303,7 @@ export function GovernanceIntelligence() {
                       <div>
                         <p
                           style={{
-                            fontSize: '14px',
+                            fontSize: '16px',
                             color: C.text,
                             lineHeight: 1.65,
                             letterSpacing: '-0.1px',
@@ -319,7 +319,7 @@ export function GovernanceIntelligence() {
                               background: C.white,
                               border: `1px solid #A7C4FC`,
                               borderRadius: '20px',
-                              fontSize: '11.5px',
+                              fontSize: '13.5px',
                               color: C.blue,
                               fontWeight: '520',
                               display: 'flex',
@@ -336,7 +336,7 @@ export function GovernanceIntelligence() {
                               background: C.white,
                               border: `1px solid ${C.border}`,
                               borderRadius: '20px',
-                              fontSize: '11.5px',
+                              fontSize: '13.5px',
                               color: C.textSec,
                               display: 'flex',
                               alignItems: 'center',
@@ -365,7 +365,7 @@ export function GovernanceIntelligence() {
               boxShadow: C.shadow,
             }}
           >
-            <div style={{ fontSize: '13px', fontWeight: '580', color: C.text, marginBottom: '14px', letterSpacing: '-0.2px' }}>
+            <div style={{ fontSize: '15px', fontWeight: '580', color: C.text, marginBottom: '14px', letterSpacing: '-0.2px' }}>
               Suggested Intelligence Queries
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
@@ -397,7 +397,7 @@ export function GovernanceIntelligence() {
                   }}
                 >
                   <MessageSquare size={13} color={C.textSec} style={{ flexShrink: 0 }} />
-                  <span style={{ fontSize: '13px', color: C.text, flex: 1 }}>{q}</span>
+                  <span style={{ fontSize: '15px', color: C.text, flex: 1 }}>{q}</span>
                   <ChevronRight size={13} color={C.textSec} style={{ opacity: 0.5 }} />
                 </button>
               ))}
@@ -415,7 +415,7 @@ export function GovernanceIntelligence() {
             }}
           >
             <div style={{ padding: '20px 22px', borderBottom: `1px solid ${C.border}` }}>
-              <div style={{ fontSize: '13.5px', fontWeight: '620', color: C.text, letterSpacing: '-0.2px' }}>
+              <div style={{ fontSize: '15.5px', fontWeight: '620', color: C.text, letterSpacing: '-0.2px' }}>
                 Recent Intelligence Insights
               </div>
             </div>
@@ -444,10 +444,10 @@ export function GovernanceIntelligence() {
                     <BookOpen size={11} color={C.blue} />
                   </div>
                   <div style={{ flex: 1 }}>
-                    <div style={{ fontSize: '13px', fontWeight: '520', color: C.text, marginBottom: '4px', letterSpacing: '-0.1px' }}>
+                    <div style={{ fontSize: '15px', fontWeight: '520', color: C.text, marginBottom: '4px', letterSpacing: '-0.1px' }}>
                       {ins.query}
                     </div>
-                    <p style={{ fontSize: '12.5px', color: C.textSec, lineHeight: 1.55, marginBottom: '10px' }}>
+                    <p style={{ fontSize: '14.5px', color: C.textSec, lineHeight: 1.55, marginBottom: '10px' }}>
                       {ins.response}
                     </p>
                     <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', alignItems: 'center' }}>
@@ -457,7 +457,7 @@ export function GovernanceIntelligence() {
                           background: ins.confidence === 'High' ? '#F0FDF4' : '#FFFBEB',
                           color: ins.confidence === 'High' ? '#15803D' : '#92400E',
                           borderRadius: '20px',
-                          fontSize: '11px',
+                          fontSize: '13px',
                           fontWeight: '520',
                         }}
                       >
@@ -472,7 +472,7 @@ export function GovernanceIntelligence() {
                             color: C.textSec,
                             border: `1px solid ${C.border}`,
                             borderRadius: '20px',
-                            fontSize: '11px',
+                            fontSize: '13px',
                           }}
                         >
                           {t}
@@ -481,7 +481,7 @@ export function GovernanceIntelligence() {
                       <span
                         style={{
                           marginLeft: 'auto',
-                          fontSize: '11px',
+                          fontSize: '13px',
                           color: C.textSec,
                           display: 'flex',
                           alignItems: 'center',
@@ -511,16 +511,16 @@ export function GovernanceIntelligence() {
               boxShadow: C.shadow,
             }}
           >
-            <div style={{ fontSize: '13px', fontWeight: '580', color: C.text, marginBottom: '4px', letterSpacing: '-0.2px' }}>
+            <div style={{ fontSize: '15px', fontWeight: '580', color: C.text, marginBottom: '4px', letterSpacing: '-0.2px' }}>
               State OMES Trend
             </div>
-            <div style={{ fontSize: '11.5px', color: C.textSec, marginBottom: '16px' }}>Sep 2025 – Feb 2026</div>
+            <div style={{ fontSize: '13.5px', color: C.textSec, marginBottom: '16px' }}>Sep 2025 – Feb 2026</div>
             <div style={{ marginBottom: '12px' }}>
-              <span style={{ fontSize: '30px', fontWeight: '660', color: C.text, letterSpacing: '-0.8px' }}>4.18</span>
+              <span style={{ fontSize: '32px', fontWeight: '660', color: C.text, letterSpacing: '-0.8px' }}>4.18</span>
               <span
                 style={{
                   marginLeft: '8px',
-                  fontSize: '12px',
+                  fontSize: '14px',
                   color: C.green,
                   fontWeight: '520',
                   background: '#ECFDF5',
@@ -542,7 +542,7 @@ export function GovernanceIntelligence() {
                 <XAxis dataKey="month" tick={{ fontSize: 10, fill: C.textSec }} axisLine={false} tickLine={false} />
                 <YAxis domain={[3.6, 4.3]} tick={{ fontSize: 10, fill: C.textSec }} axisLine={false} tickLine={false} tickCount={3} />
                 <Tooltip
-                  contentStyle={{ background: C.white, border: `1px solid ${C.border}`, borderRadius: '8px', fontSize: '11px' }}
+                  contentStyle={{ background: C.white, border: `1px solid ${C.border}`, borderRadius: '8px', fontSize: '13px' }}
                   formatter={(v: number) => [v.toFixed(2), 'OMES']}
                 />
                 <Area type="monotone" dataKey="omes" stroke={C.blue} strokeWidth={2} fill="url(#stateGrad)" dot={false} />
@@ -560,7 +560,7 @@ export function GovernanceIntelligence() {
               boxShadow: C.shadow,
             }}
           >
-            <div style={{ fontSize: '13px', fontWeight: '580', color: C.text, marginBottom: '14px', letterSpacing: '-0.2px' }}>
+            <div style={{ fontSize: '15px', fontWeight: '580', color: C.text, marginBottom: '14px', letterSpacing: '-0.2px' }}>
               Intelligence Context
             </div>
             {[
@@ -583,9 +583,9 @@ export function GovernanceIntelligence() {
                 >
                   <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                     <Icon size={13} color={C.textSec} />
-                    <span style={{ fontSize: '12.5px', color: C.textSec }}>{item.label}</span>
+                    <span style={{ fontSize: '14.5px', color: C.textSec }}>{item.label}</span>
                   </div>
-                  <span style={{ fontSize: '13px', fontWeight: '560', color: C.text }}>{item.value}</span>
+                  <span style={{ fontSize: '15px', fontWeight: '560', color: C.text }}>{item.value}</span>
                 </div>
               );
             })}

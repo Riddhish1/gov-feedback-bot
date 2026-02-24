@@ -110,7 +110,7 @@ function KPICard({ label, value, micro, microPositive = true, sub, sparkData, sp
     <div
       style={{
         background: C.white,
-        border: `1px solid ${C.border}`,
+        border: `1.5px solid ${C.border}`,
         borderRadius: '14px',
         padding: '24px',
         flex: 1,
@@ -605,6 +605,31 @@ export function Overview() {
     }, 1200);
   };
 
+  const handleExportCSV = () => {
+    const columns = ["Office ID", "Office Name", "District", "Division", "OMES Score", "Trend", "Primary Theme"];
+
+    const rows = offices.map((o) => [
+      o.id || '',
+      `"${o.name}"` || '""',
+      `"${o.district}"` || '""',
+      `"${o.division}"` || '""',
+      o.omes?.toFixed(2) || '0.00',
+      o.trend || '-',
+      `"${o.theme}"` || '""'
+    ]);
+
+    const csvContent = [columns.join(","), ...rows.map(r => r.join(","))].join("\n");
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+
+    const link = document.createElement("a");
+    link.href = url;
+    link.setAttribute("download", `MH_Gov_Dashboard_Export_Feb2026.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   return (
     <div style={{ padding: '40px 48px', maxWidth: '1400px', margin: '0 auto' }}>
       {/* Page Header */}
@@ -648,6 +673,7 @@ export function Overview() {
               Feb 2026
             </div>
             <div
+              onClick={handleExportCSV}
               style={{
                 padding: '8px 16px',
                 background: C.blue,
@@ -670,7 +696,7 @@ export function Overview() {
       </div>
 
       {/* KPI Strip */}
-      <div style={{ display: 'flex', gap: '16px', marginBottom: '36px' }}>
+      <div style={{ display: 'flex', gap: '24px', marginBottom: '36px' }}>
         <KPICard
           label="Statewide Office Experience Score"
           value={summary?.stateOmes ? summary.stateOmes.toFixed(2) : '---'}
@@ -717,7 +743,7 @@ export function Overview() {
       <div
         style={{
           background: C.white,
-          border: `1px solid ${C.border}`,
+          border: `2px solid ${C.border}`,
           borderRadius: '16px',
           marginBottom: '24px',
           boxShadow: C.shadow,
@@ -922,612 +948,9 @@ export function Overview() {
         ))}
       </div>
 
-      {/* Section 2: AI Governance Intelligence Panel */}
-      <div
-        style={{
-          background: C.white,
-          border: `1px solid ${C.border}`,
-          borderRadius: '16px',
-          marginBottom: '24px',
-          boxShadow: C.shadow,
-          overflow: 'hidden',
-        }}
-      >
-        <div
-          style={{
-            padding: '22px 28px',
-            borderBottom: `1px solid ${C.border}`,
-            display: 'flex',
-            alignItems: 'center',
-            gap: '10px',
-          }}
-        >
-          <div
-            style={{
-              width: '32px',
-              height: '32px',
-              background: 'linear-gradient(135deg, #EAF2FF 0%, #DBEAFE 100%)',
-              borderRadius: '9px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-            }}
-          >
-            <Sparkles size={15} color={C.blue} />
-          </div>
-          <div>
-            <div style={{ fontSize: '15px', fontWeight: '620', color: C.text, letterSpacing: '-0.3px' }}>
-              Governance Intelligence Query
-            </div>
-            <div style={{ fontSize: '12px', color: C.textSec }}>
-              AI-advisory · Pattern & trend analysis
-            </div>
-          </div>
-          <div
-            style={{
-              marginLeft: 'auto',
-              padding: '4px 12px',
-              background: C.blueSoft,
-              color: C.blue,
-              borderRadius: '20px',
-              fontSize: '11.5px',
-              fontWeight: '520',
-              border: `1px solid ${C.blueMid}`,
-            }}
-          >
-            Advisory Only
-          </div>
-        </div>
 
-        <div style={{ padding: '24px 28px' }}>
-          {/* Query Input */}
-          <div style={{ marginBottom: '20px' }}>
-            <div
-              style={{
-                display: 'flex',
-                gap: '10px',
-                background: C.bg,
-                border: `1px solid ${C.border}`,
-                borderRadius: '12px',
-                padding: '14px 16px',
-                transition: 'border-color 0.15s',
-              }}
-            >
-              <input
-                value={aiQuery}
-                onChange={(e) => setAiQuery(e.target.value)}
-                onKeyDown={(e) => e.key === 'Enter' && handleAiQuery()}
-                placeholder="Ask about patterns, trends, or themes across offices…"
-                style={{
-                  flex: 1,
-                  border: 'none',
-                  outline: 'none',
-                  background: 'transparent',
-                  fontSize: '14px',
-                  color: C.text,
-                  letterSpacing: '-0.1px',
-                  fontFamily: 'inherit',
-                }}
-              />
-              <button
-                onClick={handleAiQuery}
-                disabled={aiLoading}
-                style={{
-                  width: '36px',
-                  height: '36px',
-                  borderRadius: '9px',
-                  background: aiLoading ? '#9BBDF8' : C.blue,
-                  border: 'none',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  cursor: aiLoading ? 'default' : 'pointer',
-                  flexShrink: 0,
-                  transition: 'background 0.15s',
-                  boxShadow: aiLoading ? 'none' : '0 2px 8px rgba(11,108,245,0.25)',
-                }}
-              >
-                {aiLoading ? (
-                  <div
-                    style={{
-                      width: '14px',
-                      height: '14px',
-                      border: '2px solid rgba(255,255,255,0.4)',
-                      borderTopColor: 'white',
-                      borderRadius: '50%',
-                      animation: 'spin 0.8s linear infinite',
-                    }}
-                  />
-                ) : (
-                  <Send size={14} color="white" />
-                )}
-              </button>
-            </div>
-          </div>
 
-          {/* AI Response */}
-          <AnimatePresence>
-            {(aiResponseVisible || !aiLoading) && aiResponseVisible && (
-              <motion.div
-                initial={{ opacity: 0, y: 8 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.3 }}
-                style={{
-                  background: 'linear-gradient(135deg, #F8FBFF 0%, #EAF2FF 100%)',
-                  border: `1px solid ${C.blueMid}`,
-                  borderRadius: '12px',
-                  padding: '20px 22px',
-                }}
-              >
-                <div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px' }}>
-                  <div
-                    style={{
-                      width: '28px',
-                      height: '28px',
-                      background: C.blue,
-                      borderRadius: '7px',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      flexShrink: 0,
-                      boxShadow: '0 2px 6px rgba(11,108,245,0.25)',
-                    }}
-                  >
-                    <Sparkles size={13} color="white" />
-                  </div>
-                  <div style={{ flex: 1 }}>
-                    <div style={{ fontSize: '14px', color: C.text, lineHeight: 1.65, letterSpacing: '-0.1px', marginBottom: '14px' }}>
-                      Positive shifts observed in municipal service delivery across 4 divisions.{' '}
-                      <strong>Average OMES improvement: +0.18</strong> over the quarter. Primary
-                      drivers include{' '}
-                      <span style={{ color: C.blue, fontWeight: '520' }}>Queue Flow Efficiency</span> and{' '}
-                      <span style={{ color: C.blue, fontWeight: '520' }}>Documentation Clarity</span>.
-                      Waiting time optimisation themes show a 23% increase in positive signal frequency.
-                    </div>
-                    <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-                      <span
-                        style={{
-                          padding: '4px 12px',
-                          background: C.white,
-                          border: `1px solid #A7C4FC`,
-                          borderRadius: '20px',
-                          fontSize: '11.5px',
-                          color: C.blue,
-                          fontWeight: '520',
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: '5px',
-                        }}
-                      >
-                        <CheckCircle2 size={11} />
-                        High Confidence
-                      </span>
-                      <span
-                        style={{
-                          padding: '4px 12px',
-                          background: C.white,
-                          border: `1px solid ${C.border}`,
-                          borderRadius: '20px',
-                          fontSize: '11.5px',
-                          color: C.textSec,
-                        }}
-                      >
-                        Based on 19,842 submissions
-                      </span>
-                      <span
-                        style={{
-                          padding: '4px 12px',
-                          background: C.white,
-                          border: `1px solid ${C.border}`,
-                          borderRadius: '20px',
-                          fontSize: '11.5px',
-                          color: C.textSec,
-                        }}
-                      >
-                        Q1 2026 Analysis
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
-
-          {!aiResponseVisible && !aiLoading && (
-            <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-              {[
-                'Highest OMES improvement this month?',
-                'Districts with stable performance patterns?',
-                'Policy themes requiring attention?',
-              ].map((q) => (
-                <button
-                  key={q}
-                  onClick={() => { setAiQuery(q); setAiResponseVisible(false); }}
-                  style={{
-                    padding: '6px 14px',
-                    background: C.white,
-                    border: `1px solid ${C.border}`,
-                    borderRadius: '20px',
-                    fontSize: '12px',
-                    color: C.textSec,
-                    cursor: 'pointer',
-                    transition: 'all 0.12s',
-                  }}
-                >
-                  {q}
-                </button>
-              ))}
-            </div>
-          )}
-        </div>
-      </div>
-
-      {/* Section 3: Theme Summary */}
-      <div
-        style={{
-          display: 'grid',
-          gridTemplateColumns: '1fr 1fr 1fr',
-          gap: '16px',
-          marginBottom: '24px',
-        }}
-      >
-        {/* Top Experience Themes */}
-        <div
-          style={{
-            background: C.white,
-            border: `1px solid ${C.border}`,
-            borderRadius: '16px',
-            padding: '22px',
-            boxShadow: C.shadow,
-          }}
-        >
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '16px' }}>
-            <div
-              style={{
-                width: '28px',
-                height: '28px',
-                background: C.blueSoft,
-                borderRadius: '8px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-              }}
-            >
-              <Activity size={13} color={C.blue} />
-            </div>
-            <div style={{ fontSize: '13.5px', fontWeight: '620', color: C.text, letterSpacing: '-0.2px' }}>
-              Top Experience Themes
-            </div>
-          </div>
-          {['Waiting Time Optimisation', 'Queue Flow Efficiency', 'Citizen Guidance Clarity'].map((t, i) => (
-            <div
-              key={t}
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '10px',
-                padding: '10px 0',
-                borderBottom: i < 2 ? `1px solid ${C.borderLight}` : 'none',
-              }}
-            >
-              <div
-                style={{
-                  width: '22px',
-                  height: '22px',
-                  background: i === 0 ? C.blue : C.bg,
-                  borderRadius: '6px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  flexShrink: 0,
-                  fontSize: '10px',
-                  fontWeight: '700',
-                  color: i === 0 ? 'white' : C.textSec,
-                }}
-              >
-                {i + 1}
-              </div>
-              <span style={{ fontSize: '13px', color: C.text, letterSpacing: '-0.1px' }}>{t}</span>
-            </div>
-          ))}
-          <div style={{ marginTop: '14px', padding: '10px 12px', background: C.bg, borderRadius: '8px' }}>
-            <p style={{ fontSize: '11.5px', color: C.textSec, lineHeight: 1.5 }}>
-              Overall citizen sentiment remains strongly positive.
-            </p>
-          </div>
-        </div>
-
-        {/* Policy Suggestion Intelligence */}
-        <div
-          style={{
-            background: C.white,
-            border: `1px solid ${C.border}`,
-            borderRadius: '16px',
-            padding: '22px',
-            boxShadow: C.shadow,
-          }}
-        >
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '16px' }}>
-            <div
-              style={{
-                width: '28px',
-                height: '28px',
-                background: '#F0FDF4',
-                borderRadius: '8px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-              }}
-            >
-              <FileText size={13} color="#15803D" />
-            </div>
-            <div style={{ fontSize: '13.5px', fontWeight: '620', color: C.text, letterSpacing: '-0.2px' }}>
-              Policy Suggestion Intelligence
-            </div>
-          </div>
-          {[
-            'Simplified Application Tracking',
-            'Improved Status Visibility',
-            'Digital Access Awareness',
-          ].map((t, i) => (
-            <div
-              key={t}
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '10px',
-                padding: '10px 0',
-                borderBottom: i < 2 ? `1px solid ${C.borderLight}` : 'none',
-              }}
-            >
-              <div
-                style={{
-                  width: '6px',
-                  height: '6px',
-                  borderRadius: '50%',
-                  background: '#10B981',
-                  flexShrink: 0,
-                  marginLeft: '8px',
-                }}
-              />
-              <span style={{ fontSize: '13px', color: C.text, letterSpacing: '-0.1px' }}>{t}</span>
-            </div>
-          ))}
-          <div style={{ marginTop: '14px', padding: '10px 12px', background: '#F0FDF4', borderRadius: '8px' }}>
-            <p style={{ fontSize: '11.5px', color: '#15803D', lineHeight: 1.5 }}>
-              AI-surfaced from citizen participation patterns.
-            </p>
-          </div>
-        </div>
-
-        {/* Process Reform Intelligence */}
-        <div
-          style={{
-            background: C.white,
-            border: `1px solid ${C.border}`,
-            borderRadius: '16px',
-            padding: '22px',
-            boxShadow: C.shadow,
-          }}
-        >
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '16px' }}>
-            <div
-              style={{
-                width: '28px',
-                height: '28px',
-                background: '#FFFBEB',
-                borderRadius: '8px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-              }}
-            >
-              <BarChart3 size={13} color="#D97706" />
-            </div>
-            <div style={{ fontSize: '13.5px', fontWeight: '620', color: C.text, letterSpacing: '-0.2px' }}>
-              Process Reform Intelligence
-            </div>
-          </div>
-          {[
-            'Documentation Rationalisation',
-            'Approval Flow Simplification',
-            'Service Predictability Enhancements',
-          ].map((t, i) => (
-            <div
-              key={t}
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '10px',
-                padding: '10px 0',
-                borderBottom: i < 2 ? `1px solid ${C.borderLight}` : 'none',
-              }}
-            >
-              <div
-                style={{
-                  width: '6px',
-                  height: '6px',
-                  borderRadius: '50%',
-                  background: '#F59E0B',
-                  flexShrink: 0,
-                  marginLeft: '8px',
-                }}
-              />
-              <span style={{ fontSize: '13px', color: C.text, letterSpacing: '-0.1px' }}>{t}</span>
-            </div>
-          ))}
-          <div style={{ marginTop: '14px', padding: '10px 12px', background: '#FFFBEB', borderRadius: '8px' }}>
-            <p style={{ fontSize: '11.5px', color: '#92400E', lineHeight: 1.5 }}>
-              Pattern-derived reform signals · Advisory context.
-            </p>
-          </div>
-        </div>
-      </div>
-
-      {/* Section 4: Escalation Intelligence Summary */}
-      <div
-        style={{
-          background: C.white,
-          border: `1px solid ${C.border}`,
-          borderRadius: '16px',
-          marginBottom: '40px',
-          boxShadow: C.shadow,
-          overflow: 'hidden',
-        }}
-      >
-        <div
-          style={{
-            padding: '22px 28px',
-            borderBottom: `1px solid ${C.border}`,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-          }}
-        >
-          <div>
-            <div style={{ fontSize: '15px', fontWeight: '620', color: C.text, letterSpacing: '-0.3px', marginBottom: '3px' }}>
-              Escalation Intelligence Summary
-            </div>
-            <div style={{ fontSize: '12.5px', color: C.textSec }}>
-              Pattern-triggered · Procedural review in progress
-            </div>
-          </div>
-          <span
-            style={{
-              padding: '4px 12px',
-              background: C.amberSoft,
-              color: C.amberText,
-              borderRadius: '20px',
-              fontSize: '11.5px',
-              fontWeight: '520',
-              border: '1px solid #FDE68A',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '5px',
-            }}
-          >
-            <AlertTriangle size={11} />
-            6 Active Escalations
-          </span>
-        </div>
-
-        {/* Escalation Table Header */}
-        <div
-          style={{
-            display: 'grid',
-            gridTemplateColumns: '2.5fr 2fr 1.5fr 1.5fr',
-            padding: '11px 28px',
-            background: '#FAFBFC',
-            borderBottom: `1px solid ${C.border}`,
-          }}
-        >
-          {['Office', 'Trigger Basis', 'Status', 'Action'].map((h) => (
-            <div
-              key={h}
-              style={{
-                fontSize: '11px',
-                fontWeight: '600',
-                color: C.textSec,
-                textTransform: 'uppercase',
-                letterSpacing: '0.07em',
-              }}
-            >
-              {h}
-            </div>
-          ))}
-        </div>
-
-        {[
-          {
-            office: 'Nashik Municipal North',
-            district: 'Nashik',
-            trigger: 'Rolling Trend Deviation',
-            status: 'Under Administrative Review',
-            statusColor: C.amberSoft,
-            statusText: C.amberText,
-            action: 'Review',
-          },
-          {
-            office: 'Mumbai Transport Central',
-            district: 'Mumbai',
-            trigger: 'Multi-Month Pattern',
-            status: 'Monitoring Improvement Trajectory',
-            statusColor: C.blueSoft,
-            statusText: C.blue,
-            action: 'Monitor',
-          },
-        ].map((row, idx) => (
-          <div
-            key={row.office}
-            style={{
-              display: 'grid',
-              gridTemplateColumns: '2.5fr 2fr 1.5fr 1.5fr',
-              padding: '16px 28px',
-              borderBottom: idx === 0 ? `1px solid ${C.borderLight}` : 'none',
-              alignItems: 'center',
-            }}
-          >
-            <div>
-              <div style={{ fontSize: '13.5px', fontWeight: '520', color: C.text, letterSpacing: '-0.2px', marginBottom: '2px' }}>
-                {row.office}
-              </div>
-              <div style={{ fontSize: '11.5px', color: C.textSec }}>{row.district}</div>
-            </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '7px' }}>
-              <div style={{ width: '5px', height: '5px', borderRadius: '50%', background: C.amber }} />
-              <span style={{ fontSize: '12.5px', color: C.textSec }}>{row.trigger}</span>
-            </div>
-            <span
-              style={{
-                display: 'inline-flex',
-                padding: '4px 10px',
-                background: row.statusColor,
-                color: row.statusText,
-                borderRadius: '20px',
-                fontSize: '11.5px',
-                fontWeight: '500',
-                maxWidth: 'fit-content',
-              }}
-            >
-              {row.status}
-            </span>
-            <button
-              style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '5px',
-                padding: '6px 14px',
-                background: C.white,
-                border: `1px solid ${C.border}`,
-                borderRadius: '7px',
-                fontSize: '12px',
-                color: C.textSec,
-                cursor: 'pointer',
-                fontFamily: 'inherit',
-                transition: 'all 0.12s',
-                maxWidth: 'fit-content',
-              }}
-            >
-              <Eye size={12} />
-              {row.action}
-            </button>
-          </div>
-        ))}
-
-        <div
-          style={{
-            padding: '14px 28px',
-            background: '#FAFBFC',
-            borderTop: `1px solid ${C.border}`,
-          }}
-        >
-          <p style={{ fontSize: '11.5px', color: C.textSec }}>
-            Escalation is pattern-triggered, not complaint-triggered. All escalations are under standard
-            administrative review procedures.
-          </p>
-        </div>
-      </div>
+      {/* End main dashboard sections */}
 
       {/* Office Detail Drawer */}
       <OfficeDrawer office={selectedOffice} onClose={() => setSelectedOffice(null)} />
