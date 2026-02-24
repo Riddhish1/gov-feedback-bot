@@ -212,7 +212,7 @@ export default function LiveFeedback() {
                         const dt = new Date(session.created_at);
 
                         return (
-                            <div key={session._id} style={{ background: C.white, borderRadius: '14px', border: `2px solid ${C.border}`, boxShadow: C.shadow, overflow: 'hidden', display: 'flex' }}>
+                            <div key={session._id} style={{ background: C.white, borderRadius: '14px', border: `1px solid #000000`, boxShadow: C.shadow, overflow: 'hidden', display: 'flex' }}>
                                 {/* Color stripe anchor */}
                                 <div style={{ width: '6px', background: sColor.border }} />
 
@@ -277,7 +277,7 @@ export default function LiveFeedback() {
                                         </div>
 
                                         {/* Right Side: AI Analytics block */}
-                                        <div style={{ background: '#F8FAFC', padding: '20px', borderRadius: '10px', border: `1px solid ${C.borderLight}`, display: 'flex', flexDirection: 'column', gap: '14px' }}>
+                                        <div style={{ background: '#F8FAFC', padding: '20px', borderRadius: '10px', border: `1px solid #000000`, display: 'flex', flexDirection: 'column', gap: '14px' }}>
                                             <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '4px' }}>
                                                 <Sparkles size={14} color={C.blue} />
                                                 <span style={{ fontSize: '14px', fontWeight: '640', color: C.blue, textTransform: 'uppercase', letterSpacing: '0.05em' }}>AI Analytics Layer</span>
