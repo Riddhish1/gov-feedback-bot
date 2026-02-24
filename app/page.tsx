@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
@@ -179,98 +179,14 @@ function KPICard({ label, value, micro, microPositive = true, sub, sparkData, sp
   );
 }
 
-/* ─── Office Data ────────────────────────────────────────── */
-const officeData = [
-  {
-    id: 1,
-    name: 'Pune Revenue Office A',
-    district: 'Pune',
-    division: 'Pune',
-    omes: 3.12,
-    trend: 'improving',
-    theme: 'Waiting Time Optimisation',
-    submissions: 2840,
-    confidence: 'High',
-    omonth: [2.7, 2.8, 2.9, 3.0, 3.05, 3.12],
-    r3: [2.85, 2.95, 3.06],
-    r6: [2.7, 2.75, 2.82, 2.9, 3.0, 3.12],
-    themes: ['Waiting Time Optimisation', 'Citizen Guidance Clarity', 'Process Flow Smoothness'],
-    snippets: [
-      'Process was smooth. Waiting time improving.',
-      'Staff guidance was clear and helpful.',
-      'Queue system functioning well.',
-    ],
-  },
-  {
-    id: 2,
-    name: 'Nashik Municipal North',
-    district: 'Nashik',
-    division: 'Nashik',
-    omes: 2.94,
-    trend: 'improving',
-    theme: 'Queue Flow Efficiency',
-    submissions: 1920,
-    confidence: 'High',
-    omonth: [2.5, 2.6, 2.65, 2.75, 2.84, 2.94],
-    r3: [2.65, 2.78, 2.94],
-    r6: [2.5, 2.55, 2.6, 2.72, 2.83, 2.94],
-    themes: ['Queue Flow Efficiency', 'Service Counter Availability', 'Documentation Clarity'],
-    snippets: [
-      'Queue management has improved noticeably.',
-      'Staff were helpful and well-informed.',
-      'Received my certificate without delays.',
-    ],
-  },
-  {
-    id: 3,
-    name: 'Nagpur Tahsildar Office B',
-    district: 'Nagpur',
-    division: 'Nagpur',
-    omes: 3.28,
-    trend: 'stable',
-    theme: 'Documentation Clarity',
-    submissions: 3120,
-    confidence: 'High',
-    omonth: [3.2, 3.22, 3.25, 3.24, 3.27, 3.28],
-    r3: [3.23, 3.26, 3.28],
-    r6: [3.15, 3.18, 3.21, 3.24, 3.26, 3.28],
-    themes: ['Documentation Clarity', 'Application Process Simplicity', 'Staff Responsiveness'],
-    snippets: [
-      'Documents were well-organised and explained.',
-      'Process was straightforward once clarified.',
-      'Appreciated the clear written instructions.',
-    ],
-  },
-  {
-    id: 4,
-    name: 'Mumbai Transport Office Central',
-    district: 'Mumbai',
-    division: 'Konkan',
-    omes: 3.05,
-    trend: 'improving',
-    theme: 'System Throughput',
-    submissions: 4680,
-    confidence: 'High',
-    omonth: [2.7, 2.8, 2.88, 2.95, 3.0, 3.05],
-    r3: [2.88, 2.97, 3.05],
-    r6: [2.62, 2.7, 2.8, 2.9, 2.97, 3.05],
-    themes: ['System Throughput', 'Digital Service Integration', 'Appointment Availability'],
-    snippets: [
-      'Online booking worked smoothly this time.',
-      'Counter staff very efficient.',
-      'Wait time much reduced from last visit.',
-    ],
-  },
-];
-
 /* ─── Drawer ─────────────────────────────────────────────── */
-function OfficeDrawer({ office, onClose }: { office: (typeof officeData)[0] | null; onClose: () => void }) {
+function OfficeDrawer({ office, onClose }: { office: any | null; onClose: () => void }) {
   const [tab, setTab] = useState<'monthly' | 'r3' | 'r6'>('monthly');
 
   const getChartData = () => {
-    if (tab === 'monthly') return office!.omonth.map((v, i) => ({ label: `M${i + 1}`, value: v }));
-    if (tab === 'r3') return office!.r3.map((v, i) => ({ label: `Q${i + 1}`, value: v }));
-    return office!.r6.map((v, i) => ({ label: `P${i + 1}`, value: v }));
+    if (tab === 'monthly') return office!.omonth.map((v: number, i: number) => ({ label: `M${i + 1}`, value: v }));
+    if (tab === 'r3') return office!.r3.map((v: number, i: number) => ({ label: `Q${i + 1}`, value: v }));
+    return office!.r6.map((v: number, i: number) => ({ label: `P${i + 1}`, value: v }));
   };
 
   return (
@@ -507,7 +423,7 @@ function OfficeDrawer({ office, onClose }: { office: (typeof officeData)[0] | nu
                   AI Theme Clusters
                 </div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                  {office.themes.map((theme, i) => (
+                  {office.themes.map((theme: string, i: number) => (
                     <div
                       key={theme}
                       style={{
@@ -559,7 +475,7 @@ function OfficeDrawer({ office, onClose }: { office: (typeof officeData)[0] | nu
                   Recent Feedback Snippets
                 </div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                  {office.snippets.map((s) => (
+                  {office.snippets.map((s: string) => (
                     <div
                       key={s}
                       style={{
@@ -631,10 +547,53 @@ function OfficeDrawer({ office, onClose }: { office: (typeof officeData)[0] | nu
 
 /* ─── Main Overview Component ────────────────────────────── */
 export function Overview() {
-  const [selectedOffice, setSelectedOffice] = useState<(typeof officeData)[0] | null>(null);
+  const [offices, setOffices] = useState<any[]>([]);
+  const [summary, setSummary] = useState<any>(null);
+  const [selectedOffice, setSelectedOffice] = useState<any | null>(null);
   const [aiQuery, setAiQuery] = useState('Which administrative themes show highest improvement this quarter?');
   const [aiLoading, setAiLoading] = useState(false);
   const [aiResponseVisible, setAiResponseVisible] = useState(false);
+
+  useEffect(() => {
+    async function fetchDashboardData() {
+      try {
+        const [sumRes, offRes] = await Promise.all([
+          fetch('/api/dashboard/summary'),
+          fetch('/api/offices?limit=15&sortKey=omes&sortDir=desc')
+        ]);
+        const sumData = await sumRes.json();
+        const offData = await offRes.json();
+
+        setSummary(sumData);
+
+        // Map native Offces to Dashboard structural bindings
+        const mappedOffices = (offData.offices || []).map((o: any) => ({
+          id: o.office_id,
+          name: o.office_name,
+          district: o.district || 'Unknown',
+          division: o.division || 'Unknown',
+          omes: o.metadata?.omes || 0,
+          trend: o.metadata?.trend || 'stable',
+          theme: o.metadata?.themes?.[0] || 'Pending NLP',
+          submissions: o.metadata?.submissions_monthly || 0,
+          confidence: o.metadata?.confidence || 'N/A',
+          themes: o.metadata?.themes || [],
+          snippets: ['Awaiting historical feedback parse hook...'],
+          omonth: [0, 0, 0, 0, 0, o.metadata?.omes || 0],
+          r3: [0, 0, o.metadata?.omes || 0],
+          r6: [0, 0, 0, 0, 0, o.metadata?.omes || 0]
+        }));
+
+        // Let's sort manually on frontend just in case by highest OMES
+        mappedOffices.sort((a: any, b: any) => b.omes - a.omes);
+        setOffices(mappedOffices);
+
+      } catch (err) {
+        console.error("Dashboard mount error:", err);
+      }
+    }
+    fetchDashboardData();
+  }, []);
 
   const handleAiQuery = () => {
     if (!aiQuery.trim()) return;
@@ -655,9 +614,9 @@ export function Overview() {
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
               <span style={{ fontSize: '12px', color: C.textSec }}>Maharashtra</span>
               <span style={{ color: C.border, fontSize: '12px' }}>›</span>
-              
+
               <span style={{ color: C.border, fontSize: '12px' }}>›</span>
-              
+
             </div>
             <h1
               style={{
@@ -713,43 +672,43 @@ export function Overview() {
       {/* KPI Strip */}
       <div style={{ display: 'flex', gap: '16px', marginBottom: '36px' }}>
         <KPICard
-          label="Monthly Office Experience Score"
-          value="4.18"
-          micro="↑ +0.12 vs Last Month"
+          label="Statewide Office Experience Score"
+          value={summary?.stateOmes ? summary.stateOmes.toFixed(2) : '---'}
+          micro="Live Aggregate"
           microPositive={true}
-          sub="Rolling 3-Month Score: 4.05"
-          sparkData={[3.72, 3.80, 3.85, 3.90, 3.95, 4.02, 4.10, 4.18]}
+          sub="Rolling Global Baseline"
+          sparkData={[3.72, 3.80, 3.85, 3.90, 3.95, summary?.stateOmes || 3.9]}
           sparkId="omes"
         />
         <KPICard
-          label="Offices Below Performance Threshold"
-          value="18"
+          label="Offices Under Review"
+          value={summary?.officesUnderReview?.toString() || '0'}
           unit="Offices"
-          micro="↓ Improving Trend"
-          microPositive={true}
-          sub="Rolling 6-Month Stability: Strong"
-          sparkData={[26, 25, 23, 22, 21, 20, 19, 18]}
-          sparkId="below"
-          sparkColor="#10B981"
-        />
-        <KPICard
-          label="Escalation Status"
-          value="6"
-          unit="Active"
-          micro="Pattern-Triggered"
+          micro="↓ Requires Action"
           microPositive={false}
-          sub="No critical concentration detected"
-          sparkData={[9, 8, 9, 7, 8, 6, 7, 6]}
-          sparkId="esc"
+          sub="Flagged by internal systems"
+          sparkData={[26, 25, 23, 22, 21, summary?.officesUnderReview || 10]}
+          sparkId="below"
           sparkColor={C.amber}
         />
         <KPICard
-          label="Citizen Submissions This Month"
-          value="19,842"
+          label="Actionable Reform Signals"
+          value={summary?.reformSignals?.toString() || '0'}
+          unit="Signals"
+          micro="Pattern-Triggered"
+          microPositive={false}
+          sub="Extracted via Direct Processes"
+          sparkData={[9, 8, 9, 7, 8, summary?.reformSignals || 0]}
+          sparkId="esc"
+          sparkColor={C.blue}
+        />
+        <KPICard
+          label="Total Aggregated Submissions"
+          value={summary?.totalSubmissions?.toLocaleString() || '0'}
           micro="↑ Healthy Participation"
           microPositive={true}
-          sub="Confidence Level: High"
-          sparkData={[14200, 15800, 16900, 17600, 18200, 18800, 19400, 19842]}
+          sub={`${summary?.positivePct || 0}% Positive AI Sentiment`}
+          sparkData={[14200, 15800, 16900, 17600, 18200, summary?.totalSubmissions || 19000]}
           sparkId="subs"
         />
       </div>
@@ -826,7 +785,7 @@ export function Overview() {
         </div>
 
         {/* Table Rows */}
-        {officeData.map((office, idx) => (
+        {offices.map((office: any, idx) => (
           <div
             key={office.id}
             onClick={() => setSelectedOffice(office)}
@@ -834,7 +793,7 @@ export function Overview() {
               display: 'grid',
               gridTemplateColumns: '2.5fr 1fr 1fr 1.1fr 2fr',
               padding: '16px 28px',
-              borderBottom: idx < officeData.length - 1 ? `1px solid ${C.borderLight}` : 'none',
+              borderBottom: idx < offices.length - 1 ? `1px solid ${C.borderLight}` : 'none',
               cursor: 'pointer',
               transition: 'background 0.12s ease',
               alignItems: 'center',
