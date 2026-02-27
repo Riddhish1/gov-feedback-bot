@@ -770,8 +770,8 @@ export default function EscalationsPage() {
                             <Smartphone size={16} color={C.green} />
                         </div>
                         <div>
-                            <div style={{ fontSize: '18px', fontWeight: '660', color: C.text, letterSpacing: '-0.3px' }}>WhatsApp Notification Log</div>
-                            <div style={{ fontSize: '13px', color: C.textSec }}>Live alerts dispatched to officials via WhatsApp</div>
+                            <div style={{ fontSize: '18px', fontWeight: '660', color: C.text, letterSpacing: '-0.3px' }}>SMS Notification Log</div>
+                            <div style={{ fontSize: '13px', color: C.textSec }}>Live SMS alerts dispatched to officials via Twilio</div>
                         </div>
                     </div>
                     <div style={{ display: 'flex', gap: '16px' }}>

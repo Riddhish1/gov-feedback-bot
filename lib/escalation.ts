@@ -1,7 +1,7 @@
 import Office from "@/models/Office";
 import Session from "@/models/Session";
 import Escalation from "@/models/Escalation";
-import { sendEscalationWhatsApp } from "@/lib/whatsapp-notify";
+import { sendEscalationSMS } from "@/lib/sms-notify";
 
 /**
  * ESCALATION ENGINE
@@ -189,7 +189,7 @@ export async function checkEscalationForOffice(officeId: string): Promise<void> 
         console.log(`📞 [Escalation] L${requiredLevel} notification → resolved phone: ${recipientPhone ?? "NONE — no contact set on office and no DEMO_NOTIFY_NUMBER in .env"}`);
 
         if (recipientPhone) {
-            sendEscalationWhatsApp(
+            sendEscalationSMS(
                 recipientPhone,
                 {
                     office_name: o.office_name,
@@ -203,7 +203,7 @@ export async function checkEscalationForOffice(officeId: string): Promise<void> 
                     office_id: officeId,
                 },
                 newEscalation._id.toString()
-            ).catch(err => console.error("[Escalation] WhatsApp notification failed:", err));
+            ).catch(err => console.error("[Escalation] SMS notification failed:", err));
         } else {
             console.warn(
                 `[Escalation] No contact phone found for L${requiredLevel} escalation on ${officeId}. ` +
