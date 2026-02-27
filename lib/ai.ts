@@ -1,6 +1,8 @@
 import { OpenAI } from "openai";
 import Session from "@/models/Session";
 import { computeOfficeMetrics } from "./metrics";
+import { checkEscalationForOffice } from "./escalation";
+
 
 // Ensure we don't crash if the key is missing during build or early dev
 const openai = process.env.OPENAI_API_KEY
@@ -75,6 +77,9 @@ Provide your analysis in the exact JSON format below. Do not use markdown wrappe
 
         // Trigger the recalculation of the specific Office's dashboard statistics
         await computeOfficeMetrics(officeId);
+
+        // Trigger escalation check — if this office has sustained poor OMES, raise an alert
+        await checkEscalationForOffice(officeId);
 
         return finalPayload;
 
