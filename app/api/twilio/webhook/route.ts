@@ -104,7 +104,7 @@ export async function POST(request: NextRequest): Promise<Response> {
       // Close any previously open sessions for this phone (idempotent restart)
       await Session.updateMany(
         { phone, completed: false },
-        { $set: { completed: true, current_step: 5 } }
+        { $set: { completed: true, current_step: 12 } } // Mark as completed (legacy was 5, new max is 12)
       );
 
       // Create a fresh session
@@ -181,18 +181,18 @@ export async function POST(request: NextRequest): Promise<Response> {
       session.current_step = 2;
       await session.save();
 
-      if (choice === 1) return twimlResponse(QUESTIONS.OFFICE_Q1);
-      if (choice === 2) return twimlResponse(QUESTIONS.POLICY_Q1);
-      if (choice === 3) return twimlResponse(QUESTIONS.PROCESS_Q1);
+      if (choice === 1) return twimlResponse(QUESTIONS.CAT1_Q1);
+      if (choice === 2) return twimlResponse(QUESTIONS.CAT2_FLOW_SELECT);
+      if (choice === 3) return twimlResponse(QUESTIONS.CAT3_Q1_CHANGE);
 
       return twimlResponse(QUESTIONS.ERROR);
     }
-    else if (session.current_step === 5) {
-      // ── Step 5: Session already complete ────────────────────────────────────
+    else if (session.completed) {
+      // ── Session already complete ────────────────────────────────────────────
       return twimlResponse(QUESTIONS.SESSION_COMPLETED);
     }
-    else if (session.current_step >= 2 && session.current_step <= 4) {
-      // ── Step 2-4: Hand off to specific flow handlers ────────────────────────
+    else if (session.current_step >= 2 && session.current_step <= 20) {
+      // ── Step 2-20: Hand off to specific flow handlers ───────────────────────
       let flowRes: { message: string; nextStep: number; completed: boolean };
 
       switch (session.answers.flow_choice) {

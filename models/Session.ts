@@ -1,14 +1,12 @@
 import mongoose, { Document, Model, Schema } from "mongoose";
 
-// ── Step enum ─────────────────────────────────────────────────────────────────
 // 0 → waiting for START_OFFICE
-// 1 → waiting for rating (1-5)
-// 2 → waiting for feedback text
-// 3 → waiting for scheme suggestion
-// 4 → waiting for policy suggestion
-// 5 → completed
+// 1 → waiting for flow choice
+// 2-11 → Office Flow Steps
+// 12-15 → Policy Flow Steps
+// 16-20 → Process Reform Flow Steps
 
-export type SessionStep = 0 | 1 | 2 | 3 | 4 | 5;
+export type SessionStep = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14 | 15 | 16 | 17 | 18 | 19 | 20;
 
 // ── TypeScript interface ──────────────────────────────────────────────────────
 
@@ -19,7 +17,32 @@ export interface IAnswers {
   scheme_suggestion: string | null;
   policy_suggestion: string | null;
 
-  // Flow specific extensions
+  // Office Flow (10 Steps)
+  cat1_q1_helpdesk?: string | null;
+  cat1_q2_charter?: string | null;
+  cat1_q3_map?: string | null;
+  cat1_q4_seating?: number | null;
+  cat1_q5_water?: string | null;
+  cat1_q6_toilets?: number | null;
+  cat1_q7_fulfilled?: string | null;
+  cat1_q8_service?: string | null;
+  cat1_q9_overall?: number | null;
+  cat1_q10_comments?: string | null;
+
+  // Category 2 Flow
+  cat2_flow_type?: string | null;
+  cat2_scheme_name?: string | null;
+  cat2_improvement_needed?: string | null;
+  cat2_policy_area?: string | null;
+  cat2_beneficiary?: string | null;
+  cat2_mandatory_feedback?: string | null;
+
+  // Category 3 Flow
+  cat3_change_type?: string | null;
+  cat3_suggestion?: string | null;
+  cat3_department?: string | null;
+
+  // Legacy Office Fields
   office_rating?: number | null;
   office_issue?: string | null;
   office_positive?: string | null;
@@ -61,6 +84,28 @@ const AnswersSchema = new Schema<IAnswers>(
     feedback: { type: String, default: null, trim: true },
     scheme_suggestion: { type: String, default: null, trim: true },
     policy_suggestion: { type: String, default: null, trim: true },
+
+    cat1_q1_helpdesk: { type: String, default: null },
+    cat1_q2_charter: { type: String, default: null },
+    cat1_q3_map: { type: String, default: null },
+    cat1_q4_seating: { type: Number, default: null, min: 1, max: 5 },
+    cat1_q5_water: { type: String, default: null },
+    cat1_q6_toilets: { type: Number, default: null, min: 1, max: 5 },
+    cat1_q7_fulfilled: { type: String, default: null },
+    cat1_q8_service: { type: String, default: null },
+    cat1_q9_overall: { type: Number, default: null, min: 1, max: 5 },
+    cat1_q10_comments: { type: String, default: null },
+
+    cat2_flow_type: { type: String, default: null },
+    cat2_scheme_name: { type: String, default: null },
+    cat2_improvement_needed: { type: String, default: null },
+    cat2_policy_area: { type: String, default: null },
+    cat2_beneficiary: { type: String, default: null },
+    cat2_mandatory_feedback: { type: String, default: null },
+
+    cat3_change_type: { type: String, default: null },
+    cat3_suggestion: { type: String, default: null },
+    cat3_department: { type: String, default: null },
 
     office_rating: { type: Number, default: null, min: 1, max: 5 },
     office_issue: { type: String, default: null, trim: true },
@@ -112,7 +157,7 @@ const SessionSchema = new Schema<ISession>(
       required: true,
       default: 0,
       min: 0,
-      max: 5,
+      max: 20,
     },
     answers: {
       type: AnswersSchema,
@@ -125,6 +170,25 @@ const SessionSchema = new Schema<ISession>(
         office_rating: null,
         office_issue: null,
         office_positive: null,
+        cat1_q1_helpdesk: null,
+        cat1_q2_charter: null,
+        cat1_q3_map: null,
+        cat1_q4_seating: null,
+        cat1_q5_water: null,
+        cat1_q6_toilets: null,
+        cat1_q7_fulfilled: null,
+        cat1_q8_service: null,
+        cat1_q9_overall: null,
+        cat1_q10_comments: null,
+        cat2_flow_type: null,
+        cat2_scheme_name: null,
+        cat2_improvement_needed: null,
+        cat2_policy_area: null,
+        cat2_beneficiary: null,
+        cat2_mandatory_feedback: null,
+        cat3_change_type: null,
+        cat3_suggestion: null,
+        cat3_department: null,
         policy_name: null,
         policy_improvement_type: null,
         policy_beneficiary: null,
