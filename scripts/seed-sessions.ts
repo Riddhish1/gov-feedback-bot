@@ -46,16 +46,28 @@ const randomDate = () => {
 };
 
 // Generate highly realistic, mostly positive, often multilingual feedback templates
-const feedbackTemplates = [
-    // -------- MOSTLY POSITIVE (Target ~70%) --------
-
-    // Office Experience (Flow 1) - English
+const feedbackTemplates: any[] = [
+    // -------- CATEGORY 1: OFFICE EXPERIENCE (10 STEPS) --------
     {
         flow: 1,
-        rating: 5,
-        office_rating: 5,
+        rating: 5, // used for feedback text rating
         feedback: "The staff was very helpful and the token system moved fast.",
+        // Cat1 Specifics:
+        cat1_q1_helpdesk: "Yes",
+        cat1_q2_charter: "Yes",
+        cat1_q3_map: "Yes",
+        cat1_q4_seating: 5,
+        cat1_q5_water: "Yes",
+        cat1_q6_toilets: 4,
+        cat1_q7_fulfilled: "Fully",
+        cat1_q8_service: "Certificate",
+        cat1_q9_overall: 5,
+        cat1_q10_comments: "The staff was very helpful and the token system moved fast.",
+
+        // For backwards compatibility metrics:
+        office_rating: 5,
         office_positive: "Token system efficiency",
+
         sentiment: "Positive",
         confidence: 94,
         themes: ["Queue Flow Efficiency", "Staff Behavior"],
@@ -64,64 +76,82 @@ const feedbackTemplates = [
     {
         flow: 1,
         rating: 4,
-        office_rating: 4,
-        feedback: "Overall good experience but parking was a little difficult to find.",
-        office_issue: "Parking availability",
-        office_positive: "General service",
-        sentiment: "Positive",
-        confidence: 88,
-        themes: ["General Experience", "Infrastructure"],
-        keywords: ["parking", "good experience"],
-    },
-    // Office Experience (Flow 1) - Marathi (with translation)
-    {
-        flow: 1,
-        rating: 5,
-        office_rating: 5,
-        feedback: "खूप छान आणि जलद काम झाले. अधिकाऱ्यांनी चांगली मदत केली.",
-        translated_text: "Very good and fast work. Officers helped well.",
-        office_positive: "Speed of work and helpful officers",
-        sentiment: "Positive",
-        confidence: 96,
-        themes: ["Processing Speed", "Staff Behavior"],
-        keywords: ["जलद", "मदत", "fast work", "helpful"],
-    },
-    {
-        flow: 1,
-        rating: 4,
-        office_rating: 4,
         feedback: "माझे काम एकाच दिवसात झाले. 7/12 लवकर मिळाला.",
         translated_text: "My work was done in a single day. Got the 7/12 extract quickly.",
+
+        cat1_q1_helpdesk: "Yes",
+        cat1_q2_charter: "Partially",
+        cat1_q3_map: "No",
+        cat1_q4_seating: 3,
+        cat1_q5_water: "Yes",
+        cat1_q6_toilets: 3,
+        cat1_q7_fulfilled: "Fully",
+        cat1_q8_service: "Land Record",
+        cat1_q9_overall: 4,
+        cat1_q10_comments: "माझे काम एकाच दिवसात झाले. 7/12 लवकर मिळाला.",
+
+        office_rating: 4,
         office_positive: "Same-day delivery",
+
         sentiment: "Positive",
         confidence: 92,
         themes: ["Document Issuance", "Processing Speed"],
         keywords: ["लवकर", "quick", "7/12"],
     },
+    {
+        flow: 1,
+        rating: 1,
+        feedback: "Have been visiting for 3 weeks just for one signature. Very frustrating slow process.",
 
-    // Policy Suggestion (Flow 2) - English
+        cat1_q1_helpdesk: "No",
+        cat1_q2_charter: "No",
+        cat1_q3_map: "No",
+        cat1_q4_seating: 2,
+        cat1_q5_water: "No",
+        cat1_q6_toilets: 1,
+        cat1_q7_fulfilled: "No",
+        cat1_q8_service: "Other",
+        cat1_q9_overall: 1,
+        cat1_q10_comments: "Have been visiting for 3 weeks just for one signature.",
+
+        office_rating: 1,
+        office_issue: "Excessive delay in approvals",
+
+        sentiment: "Negative",
+        confidence: 97,
+        themes: ["Approval Flow Delays", "Staff Unresponsiveness"],
+        keywords: ["3 weeks", "frustrating", "slow"],
+    },
+
+    // -------- CATEGORY 2: POLICY SUGGESTION --------
     {
         flow: 2,
         rating: 4,
-        policy_name: "Laadki Bahin Yojana",
-        policy_improvement_type: "Awareness",
-        policy_beneficiary: "Women in rural areas",
+        feedback: "Please increase awareness about this scheme in remote villages through Gram Panchayats.",
         policy_suggestion: "Please increase awareness about this scheme in remote villages through Gram Panchayats.",
+
+        cat2_flow_type: "Improve Existing Scheme",
+        cat2_scheme_name: "PM Kisan",
+        cat2_improvement_needed: "Eligibility Confusion",
+        cat2_mandatory_feedback: "Please increase awareness about this scheme in remote villages through Gram Panchayats.",
+
         sentiment: "Positive",
         confidence: 89,
         themes: ["Digital Access Awareness", "Rural Outreach"],
         keywords: ["awareness", "villages", "scheme outreach"],
         reform: "Mandate local Gram Panchayat awareness drives for state welfare schemes.",
     },
-    // Policy Suggestion (Flow 2) - Marathi / English Mix
     {
         flow: 2,
         rating: 5,
-        policy_name: "Sanjay Gandhi Niradhar Yojana",
-        policy_improvement_type: "Online Access",
-        policy_beneficiary: "Senior Citizens",
-        policy_suggestion: "It would be great if senior citizens could submit life certificates online. जेष्ठ नागरिकांना वारंवार कार्यालयात यावे लागते.",
+        feedback: "जेष्ठ नागरिकांना वारंवार कार्यालयात यावे लागते.",
         translated_text: "It would be great if senior citizens could submit life certificates online. Senior citizens have to visit the office frequently.",
+        policy_suggestion: "It would be great if senior citizens could submit life certificates online.",
+
+        cat2_flow_type: "Amend Existing Policy / Act",
+        cat2_policy_area: "Health",
+        cat2_mandatory_feedback: "It would be great if senior citizens could submit life certificates online. जेष्ठ नागरिकांना वारंवार कार्यालयात यावे लागते.",
+
         sentiment: "Positive",
         confidence: 91,
         themes: ["Digital Accessibility", "Senior Citizen Friendly"],
@@ -129,82 +159,39 @@ const feedbackTemplates = [
         reform: "Develop digital portal for remote life certificate submission.",
     },
 
-    // Process Reform (Flow 3) - English
+    // -------- CATEGORY 3: PROCESS REFORM --------
     {
         flow: 3,
         rating: 4,
-        process_name: "Driving License Renewal",
-        process_difficulty: "Too many documents required",
+        feedback: "If Aadhar is linked, you should automatically fetch the address instead of asking for proof again.",
         process_suggestion: "If Aadhar is linked, you should automatically fetch the address instead of asking for proof again.",
-        sentiment: "Neutral", // Constructive
+
+        cat3_change_type: "Reduce documentation",
+        cat3_suggestion: "If Aadhar is linked, you should automatically fetch the address instead of asking for proof again.",
+        cat3_department: "Employment",
+
+        sentiment: "Neutral",
         confidence: 90,
         themes: ["Documentation Rationalisation", "Tech Integration"],
         keywords: ["aadhar", "automatic address fetch", "documents"],
         reform: "Integrate Aadhar API for automated address verification during renewals.",
     },
-    // Process Reform (Flow 3) - Marathi
     {
         flow: 3,
         rating: 5,
-        process_name: "Property Tax Payment",
-        process_difficulty: "Server down issue",
-        process_suggestion: "ऑनलाईन पेमेंट सिस्टम अधिक चांगली करा. खूप वेळा सर्व्हर डाऊन असतो.",
+        feedback: "ऑनलाईन पेमेंट सिस्टम अधिक चांगली करा. खूप वेळा सर्व्हर डाऊन असतो.",
         translated_text: "Make the online payment system better. The server is down many times.",
+        process_suggestion: "ऑनलाईन पेमेंट सिस्टम अधिक चांगली करा. खूप वेळा सर्व्हर डाऊन असतो.",
+
+        cat3_change_type: "Digitise service",
+        cat3_suggestion: "ऑनलाईन पेमेंट सिस्टम अधिक चांगली करा. खूप वेळा सर्व्हर डाऊन असतो.",
+        cat3_department: "Infrastructure", // Actually not in the dictionary exactly, but allows free text optionally
+
         sentiment: "Neutral",
         confidence: 85,
         themes: ["Digital Infrastructure", "Service Reliability"],
         keywords: ["सर्व्हर", "payment", "server down"],
         reform: "Upgrade municipal payment gateway server capacity.",
-    },
-
-    // -------- NEUTRAL / CONSTRUCTIVE (Target ~20%) --------
-    {
-        flow: 1,
-        rating: 3,
-        office_rating: 3,
-        feedback: "The queue was a bit confusing but I eventually got my certificate.",
-        office_issue: "Confusing queue management",
-        sentiment: "Neutral",
-        confidence: 82,
-        themes: ["Citizen Guidance Clarity"],
-        keywords: ["confusing queue"],
-    },
-    {
-        flow: 1,
-        rating: 3,
-        office_rating: 3,
-        feedback: "काम झाले पण तिथे बसण्यासाठी पुरेशी व्यवस्था नव्हती.",
-        translated_text: "Work was done but there was not enough seating arrangement there.",
-        office_issue: "Lack of seating",
-        sentiment: "Neutral",
-        confidence: 88,
-        themes: ["Infrastructure", "Waiting Area"],
-        keywords: ["व्यवस्था", "seating"],
-    },
-
-    // -------- NEGATIVE (Target ~10%) --------
-    {
-        flow: 1,
-        rating: 1,
-        office_rating: 1,
-        feedback: "Have been visiting for 3 weeks just for one signature. Very frustrating slow process.",
-        office_issue: "Excessive delay in approvals",
-        sentiment: "Negative",
-        confidence: 97,
-        themes: ["Approval Flow Delays", "Staff Unresponsiveness"],
-        keywords: ["3 weeks", "frustrating", "slow"],
-    },
-    {
-        flow: 1,
-        rating: 2,
-        office_rating: 2,
-        feedback: "अधिकारी दुपारी २ वाजेपर्यंत जेवणाच्या सुट्टीत असतात.",
-        translated_text: "Officers are on lunch break till 2 PM.",
-        office_issue: "Extended lunch breaks by staff",
-        sentiment: "Negative",
-        confidence: 94,
-        themes: ["Staff Availability", "Time Management"],
-        keywords: ["lunch break", "सुट्टी", "absent"],
     },
 ];
 
@@ -253,12 +240,30 @@ async function seedSessions() {
                 office_positive: template.office_positive || null,
                 office_issue: template.office_issue || null,
 
-                policy_name: template.policy_name || null,
-                policy_improvement_type: template.policy_improvement_type || null,
-                policy_beneficiary: template.policy_beneficiary || null,
+                // CAT 1 fields
+                cat1_q1_helpdesk: template.cat1_q1_helpdesk || null,
+                cat1_q2_charter: template.cat1_q2_charter || null,
+                cat1_q3_map: template.cat1_q3_map || null,
+                cat1_q4_seating: template.cat1_q4_seating || null,
+                cat1_q5_water: template.cat1_q5_water || null,
+                cat1_q6_toilets: template.cat1_q6_toilets || null,
+                cat1_q7_fulfilled: template.cat1_q7_fulfilled || null,
+                cat1_q8_service: template.cat1_q8_service || null,
+                cat1_q9_overall: template.cat1_q9_overall || null,
+                cat1_q10_comments: template.cat1_q10_comments || null,
 
-                process_name: template.process_name || null,
-                process_difficulty: template.process_difficulty || null,
+                // CAT 2 Fields
+                cat2_flow_type: template.cat2_flow_type || null,
+                cat2_scheme_name: template.cat2_scheme_name || null,
+                cat2_improvement_needed: template.cat2_improvement_needed || null,
+                cat2_policy_area: template.cat2_policy_area || null,
+                cat2_beneficiary: template.cat2_beneficiary || null,
+                cat2_mandatory_feedback: template.cat2_mandatory_feedback || null,
+
+                // CAT 3 Fields
+                cat3_change_type: template.cat3_change_type || null,
+                cat3_suggestion: template.cat3_suggestion || null,
+                cat3_department: template.cat3_department || null,
             },
 
             ai_analysis: {
