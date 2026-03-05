@@ -543,6 +543,7 @@ export default function EscalationsPage() {
             </div>
 
             {/* ── Demo Trigger Panel ───────────────────────── */}
+            {/* 
             <div style={{
                 background: '#FFFBEB', border: '1px solid #FDE68A',
                 borderRadius: '12px', marginBottom: '24px', overflow: 'hidden',
@@ -623,6 +624,7 @@ export default function EscalationsPage() {
                     </div>
                 )}
             </div>
+            */}
 
             {/* KPI Strip */}
             <div style={{ display: 'flex', gap: '16px', marginBottom: '28px' }}>

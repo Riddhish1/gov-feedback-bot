@@ -5,6 +5,7 @@ import { connectDB } from "@/lib/db";
 import { QUESTIONS } from "@/lib/questions";
 import { handleOfficeFlow, handlePolicyFlow, handleProcessFlow } from "@/lib/flowHandlers";
 import { processSessionWithAI } from "@/lib/ai";
+import { transcribeTwilioAudio } from "@/lib/transcription";
 import Office from "@/models/Office";
 import Session from "@/models/Session";
 
@@ -59,8 +60,11 @@ export async function POST(request: NextRequest): Promise<Response> {
 
     const from = formData.get("From") as string | null;
     const body = formData.get("Body") as string | null;
+    const numMedia = parseInt((formData.get("NumMedia") as string) || "0", 10);
+    const mediaUrl = formData.get("MediaUrl0") as string | null;
+    const mediaType = formData.get("MediaContentType0") as string | null;
 
-    if (!from || body === null) {
+    if (!from) {
       return new Response("Bad Request: missing From or Body", { status: 400 });
     }
 
@@ -79,8 +83,8 @@ export async function POST(request: NextRequest): Promise<Response> {
 
     // 3. Normalise values
     const phone = from.replace(/^whatsapp:/i, "").trim();       // e.g. +919876543210
-    const messageText = body.trim();
-    const messageUpper = messageText.toUpperCase();
+    let messageText = body ? body.trim() : "";
+    let messageUpper = messageText.toUpperCase();
 
     // 4. Connect to MongoDB
     await connectDB();
@@ -192,7 +196,29 @@ export async function POST(request: NextRequest): Promise<Response> {
       return twimlResponse(QUESTIONS.SESSION_COMPLETED);
     }
     else if (session.current_step >= 2 && session.current_step <= 20) {
-      // ── Step 2-20: Hand off to specific flow handlers ───────────────────────
+      // ── Audio Transcription Intercept ─────────────────────────────────────────
+      if (numMedia > 0 && mediaUrl && mediaType?.startsWith("audio/")) {
+        // Validate if audio is allowed for the CURRENT step the citizen is on
+        const isAudioAllowed =
+          (session.answers.flow_choice === 1 && session.current_step === 11) || // Office Exp: Q10
+          (session.answers.flow_choice === 2 && session.current_step === 9) || // Policy Sugg: Mandatory Feedback
+          (session.answers.flow_choice === 3 && session.current_step === 3);   // Process Ref: Suggestion
+
+        if (!isAudioAllowed) {
+          return twimlResponse("⚠️ Please reply with text/numbers for this step. Voice notes are only accepted for detailed descriptive feedback later in the flow.");
+        }
+
+        // Allowed -> transcribe async and block the flow until we get the text
+        const transcribedText = await transcribeTwilioAudio(mediaUrl);
+        if (transcribedText.startsWith("[Audio")) {
+          return twimlResponse("⚠️ " + transcribedText);
+        }
+
+        // Override the empty messageText with the transcribed string
+        messageText = `[VOICE-NOTE]: ${transcribedText}`;
+      }
+
+      // ── Hand off to specific flow handlers ──────────────────────────────────
       let flowRes: { message: string; nextStep: number; completed: boolean };
 
       switch (session.answers.flow_choice) {
