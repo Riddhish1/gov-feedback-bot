@@ -6,7 +6,7 @@ import { LayoutDashboard, BrainCircuit, Building2, BookOpen, MessageSquareWarnin
 
 const navItems = [
   { path: '/', icon: LayoutDashboard, label: 'Overview' },
-  // { path: '/governance', icon: BrainCircuit, label: 'Governance Intelligence' },
+  { path: '/dashboard/regional', icon: BrainCircuit, label: 'Regional Intelligence' },
   { path: '/add-office', icon: Building2, label: 'Add New Office' },
   { path: '/office-registry', icon: BookOpen, label: 'Full Office Registry' },
   { path: '/feedback', icon: MessageSquareWarning, label: 'Live AI Feed' },

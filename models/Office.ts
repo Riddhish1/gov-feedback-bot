@@ -8,6 +8,7 @@ export interface IOffice extends Document {
   district: string;
   state: string;
   division?: string;
+  taluka?: string;
   department?: string;
   office_type?: string;
   digipin?: string;
@@ -54,6 +55,7 @@ const OfficeSchema = new Schema<IOffice>(
     },
     // Extended metadata fields
     division: { type: String, trim: true, index: true },
+    taluka: { type: String, trim: true, index: true },
     department: { type: String, trim: true, index: true },
     office_type: { type: String, trim: true },
     digipin: { type: String, trim: true, index: true },
