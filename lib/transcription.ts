@@ -51,10 +51,14 @@ export async function transcribeTwilioAudio(mediaUrl: string): Promise<string> {
         // but we'll use ogg as that's what WhatsApp sends.
         const file = new File([buffer], "audio.ogg", { type: "audio/ogg" });
 
-        // 3. Call Whisper
+        // 3. Call Whisper — force Marathi (ISO 639-1: "mr") so it never
+        //    misdetects Marathi speech as Kannada, Hindi, or other regional languages.
+        //    The prompt gives Whisper contextual hints for colloquial Marathi governance vocabulary.
         const transcriptionResponse = await openai.audio.transcriptions.create({
             file: file,
             model: "whisper-1",
+            language: "mr",
+            prompt: "Marathi speech about government services, schemes, complaints, and citizen feedback in Maharashtra.",
         });
 
         console.log(`✅ [Transcription] Success: "${transcriptionResponse.text}"`);

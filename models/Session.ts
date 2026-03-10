@@ -61,6 +61,7 @@ export interface IAIAnalysis {
   translated_text: string | null;
   keywords: string[];
   reform_recommendation: string | null;
+  direct_response_to_citizen?: string | null;
 }
 
 export interface ISession extends Document {
@@ -128,6 +129,7 @@ const AIAnalysisSchema = new Schema<IAIAnalysis>(
     translated_text: { type: String, default: null },
     keywords: { type: [String], default: [] },
     reform_recommendation: { type: String, default: null },
+    direct_response_to_citizen: { type: String, default: null },
   },
   { _id: false }
 );
@@ -206,6 +208,7 @@ const SessionSchema = new Schema<ISession>(
         translated_text: null,
         keywords: [],
         reform_recommendation: null,
+        direct_response_to_citizen: null,
       }),
     },
     completed: {
