@@ -78,13 +78,15 @@ function countConsecutiveBelowThreshold(history: MonthlyOMES[], threshold: numbe
 
 /**
  * Determine the correct escalation level based on consecutive months below threshold.
+ * @param maxLevel - Optional cap on the maximum escalation level (default: 4).
+ *                   Pass 2 for Office Experience escalations (Collector is highest authority).
  * Returns null if no escalation needed.
  */
-function determineLevel(consecutiveMonths: number, hasNoAction: boolean): 1 | 2 | 3 | 4 | null {
+function determineLevel(consecutiveMonths: number, hasNoAction: boolean, maxLevel: 1 | 2 | 3 | 4 = 4): 1 | 2 | 3 | 4 | null {
     if (consecutiveMonths === 0) return null;
-    if (consecutiveMonths >= 5 && hasNoAction) return 4;
-    if (consecutiveMonths >= 5) return 3;
-    if (consecutiveMonths >= 3) return 2;
+    if (consecutiveMonths >= 5 && hasNoAction && maxLevel >= 4) return 4;
+    if (consecutiveMonths >= 5 && maxLevel >= 3) return 3;
+    if (consecutiveMonths >= 3) return Math.min(2, maxLevel) as 1 | 2;
     return 1;
 }
 
@@ -133,7 +135,11 @@ export async function checkEscalationForOffice(officeId: string): Promise<void> 
         const hasNoAction =
             !existingEscalation || existingEscalation.status === "open";
 
-        const requiredLevel = determineLevel(consecutiveMonths, hasNoAction);
+        // Office Experience escalations are capped at Level 2 (District Collector).
+        // OMES is derived entirely from flow_choice=1 (Office Experience) sessions.
+        // L3 (Divisional Commissioner) and L4 (Guardian Secretary) are reserved
+        // for policy and process reform escalation paths only.
+        const requiredLevel = determineLevel(consecutiveMonths, hasNoAction, 2);
         if (!requiredLevel) return;
 
         // Don't re-raise if an escalation of this level or higher is already open
