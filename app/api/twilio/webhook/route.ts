@@ -91,7 +91,8 @@ export async function POST(request: NextRequest): Promise<Response> {
 
     // ── Handle visible QR sentence like:
     // "I want to give feedback for my visit to {office_name} ({office_id})"
-    const visibleRegex = /^I want to give feedback for my visit to\s+(.+?)\s*\(([^)]+)\)\s*$/i;
+    // Using the `s` (dotAll) flag so `.+?` matches newlines inside multi-line office names.
+    const visibleRegex = /^I want to give feedback for my visit to\s+([\s\S]+?)\s*\(([^)]+)\)\s*$/is;
     const visibleMatch = messageText.match(visibleRegex);
     if (visibleMatch) {
       const officeId = visibleMatch[2].trim();
