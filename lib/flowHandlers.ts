@@ -1,6 +1,6 @@
 import { ISession } from "@/models/Session";
 import {
-  QUESTIONS,
+  getQuestions,
   InteractiveMessage,
   MAP_YES_NO,
   MAP_YES_NO_PARTIAL,
@@ -29,6 +29,7 @@ export async function handleOfficeFlow(
   messageText: string
 ): Promise<FlowResponse> {
   const sanitize = (text: string) => text.trim();
+  const QUESTIONS = getQuestions(session.language);
 
   switch (session.current_step) {
     case 3: // Q1: Help Desk
@@ -44,7 +45,7 @@ export async function handleOfficeFlow(
       return { message: QUESTIONS.CAT1_Q4, nextStep: 6, completed: false };
 
     case 6: { // Q4: Seating (Star rating)
-      const seatingRating = MAP_RATING[messageText];
+      const seatingRating = MAP_RATING[messageText.trim()];
       if (!seatingRating) return { message: QUESTIONS.INVALID_RATING, nextStep: 6, completed: false };
       session.answers.cat1_q4_seating = seatingRating;
       return { message: QUESTIONS.CAT1_Q5, nextStep: 7, completed: false };
@@ -55,7 +56,7 @@ export async function handleOfficeFlow(
       return { message: QUESTIONS.CAT1_Q6, nextStep: 8, completed: false };
 
     case 8: { // Q6: Toilets (Star rating)
-      const toiletRating = MAP_RATING[messageText];
+      const toiletRating = MAP_RATING[messageText.trim()];
       if (!toiletRating) return { message: QUESTIONS.INVALID_RATING, nextStep: 8, completed: false };
       session.answers.cat1_q6_toilets = toiletRating;
       return { message: QUESTIONS.CAT1_Q7, nextStep: 9, completed: false };
@@ -70,7 +71,7 @@ export async function handleOfficeFlow(
       return { message: QUESTIONS.CAT1_Q9, nextStep: 11, completed: false };
 
     case 11: { // Q9: Overall Rating (Star rating)
-      const overallRating = MAP_RATING[messageText];
+      const overallRating = MAP_RATING[messageText.trim()];
       if (!overallRating) return { message: QUESTIONS.INVALID_RATING, nextStep: 11, completed: false };
       session.answers.cat1_q9_overall = overallRating;
       session.answers.office_rating = overallRating;
@@ -79,7 +80,7 @@ export async function handleOfficeFlow(
     }
 
     case 12: // Q10: Comments (Final)
-      session.answers.cat1_q10_comments = sanitize(messageText) === "वगळा" ? "Skipped" : sanitize(messageText);
+      session.answers.cat1_q10_comments = (sanitize(messageText) === "वगळा" || sanitize(messageText).toUpperCase() === "SKIP") ? "Skipped" : sanitize(messageText);
       
       const curFeed = session.answers.feedback ? session.answers.feedback + "\n\n" : "";
       session.answers.feedback = curFeed + "[Office Experience]: " + session.answers.cat1_q10_comments;
@@ -99,6 +100,7 @@ export async function handlePolicyFlow(
   messageText: string
 ): Promise<FlowResponse> {
   const sanitize = (text: string) => text.trim();
+  const QUESTIONS = getQuestions(session.language);
 
   switch (session.current_step) {
     case 3: {
@@ -174,6 +176,7 @@ export async function handleProcessFlow(
   messageText: string
 ): Promise<FlowResponse> {
   const sanitize = (text: string) => text.trim();
+  const QUESTIONS = getQuestions(session.language);
 
   switch (session.current_step) {
     case 3: {
