@@ -9,20 +9,23 @@ const openai = process.env.OPENAI_API_KEY
     ? new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
     : null;
 
-export async function processSessionWithAI(sessionId: string, officeId: string, answers: any, flowChoice: number | null) {
+export async function processSessionWithAI(sessionId: string, officeId: string, answers: any, completedFlowsStr: string | null) {
     if (!openai) {
         console.warn("OPENAI_API_KEY not set. Skipping AI analysis.");
         return null;
     }
 
-    const flowName =
-        flowChoice === 1
-            ? "Office Experience"
-            : flowChoice === 2
-                ? "Policy Suggestion"
-                : flowChoice === 3
-                    ? "Process Reform"
-                    : "Unknown Flow";
+    const flowIds = completedFlowsStr ? completedFlowsStr.split(",").map(Number) : [];
+    
+    // Map IDs back to readable names for the AI prompt
+    const flowNames = flowIds.map(id => {
+        if (id === 1) return "Office Experience";
+        if (id === 2) return "Policy Suggestion";
+        if (id === 3) return "Process Reform";
+        return "Unknown Flow";
+    }).join(", ");
+
+    const flowName = flowNames || "Mixed / Unknown";
 
     const prompt = `
 You are an expert citizen governance intelligence AI for the Government of Maharashtra.

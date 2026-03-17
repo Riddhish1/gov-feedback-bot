@@ -1,17 +1,20 @@
 import mongoose, { Document, Model, Schema } from "mongoose";
 
 // 0 → waiting for START_OFFICE
-// 1 → waiting for flow choice
-// 2-11 → Office Flow Steps
-// 12-15 → Policy Flow Steps
-// 16-20 → Process Reform Flow Steps
+// 1 → Language Select (Marathi / English)
+// 2 → waiting for flow choice (Greeting Menu)
+// 3-12 → Office Flow Steps
+// 13-16 → Policy Flow Steps
+// 17-21 → Process Reform Flow Steps
+// 22 → Continue Menu (Multi-Flow)
 
-export type SessionStep = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14 | 15 | 16 | 17 | 18 | 19 | 20;
+export type SessionStep = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14 | 15 | 16 | 17 | 18 | 19 | 20 | 21 | 22;
 
 // ── TypeScript interface ──────────────────────────────────────────────────────
 
 export interface IAnswers {
   flow_choice: number | null;
+  completed_flows: number[];
   rating: number | null;
   feedback: string | null;
   scheme_suggestion: string | null;
@@ -66,6 +69,7 @@ export interface IAIAnalysis {
 
 export interface ISession extends Document {
   phone: string;
+  language: string | null;
   office_id: string;
   office_name: string;
   current_step: SessionStep;
@@ -81,6 +85,7 @@ export interface ISession extends Document {
 const AnswersSchema = new Schema<IAnswers>(
   {
     flow_choice: { type: Number, default: null },
+    completed_flows: { type: [Number], default: [] },
     rating: { type: Number, default: null, min: 1, max: 5 },
     feedback: { type: String, default: null, trim: true },
     scheme_suggestion: { type: String, default: null, trim: true },
@@ -144,6 +149,11 @@ const SessionSchema = new Schema<ISession>(
       trim: true,
       index: true,
     },
+    language: {
+      type: String,
+      enum: ["mr", "en", null],
+      default: null,
+    },
     office_id: {
       type: String,
       required: [true, "office_id is required"],
@@ -159,12 +169,13 @@ const SessionSchema = new Schema<ISession>(
       required: true,
       default: 0,
       min: 0,
-      max: 20,
+      max: 22,
     },
     answers: {
       type: AnswersSchema,
       default: () => ({
         flow_choice: null,
+        completed_flows: [],
         rating: null,
         feedback: null,
         scheme_suggestion: null,

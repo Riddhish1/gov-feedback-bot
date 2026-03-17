@@ -11,13 +11,36 @@ import Session from "@/models/Session";
 
 // ── TwiML helper ──────────────────────────────────────────────────────────────
 
+import { InteractiveMessage } from "@/lib/questions";
+
 /**
  * Builds a Twilio MessagingResponse (TwiML) and returns it as a Web Response.
  * Twilio requires Content-Type: text/xml.
  */
-function twimlResponse(message: string): Response {
+function twimlResponse(msg: InteractiveMessage | string): Response {
   const resp = new twilio.twiml.MessagingResponse();
-  resp.message(message);
+  
+  let body = "";
+  if (typeof msg === "string") {
+    body = msg;
+  } else {
+    body = msg.text;
+    if (msg.options && msg.options.length > 0) {
+      body += "\n\n";
+      const emojis = ["1️⃣", "2️⃣", "3️⃣", "4️⃣", "5️⃣", "6️⃣", "7️⃣", "8️⃣", "9️⃣", "🔟"];
+      msg.options.forEach((opt, idx) => {
+        const prefix = emojis[idx] || `${idx + 1}.`;
+        body += `${prefix} ${opt}\n`;
+      });
+      
+      // If the message is list type, we could hint to reply with the exact text or number
+      if (msg.type === "list" || msg.type === "button") {
+        body += "\n(Reply with the number or exact text)";
+      }
+    }
+  }
+
+  resp.message(body.trim());
   return new Response(resp.toString(), {
     status: 200,
     headers: { "Content-Type": "text/xml; charset=utf-8" },
@@ -109,15 +132,16 @@ export async function POST(request: NextRequest): Promise<Response> {
       // Close any previously open sessions for this phone (idempotent restart)
       await Session.updateMany(
         { phone, completed: false },
-        { $set: { completed: true, current_step: 12 } } // Mark as completed (legacy was 5, new max is 12)
+        { $set: { completed: true, current_step: 15 } } // Mark as completed (legacy was 5, 12, now arbitrary > max)
       );
 
       // Create a fresh session
       await Session.create({
         phone,
+        language: null,
         office_id: officeId,
         office_name: office.office_name,
-        current_step: 1,
+        current_step: 1, // Step 1 is now language
         completed: false,
         answers: {
           flow_choice: null,
@@ -128,7 +152,7 @@ export async function POST(request: NextRequest): Promise<Response> {
         },
       });
 
-      return twimlResponse(QUESTIONS.GREETING(office.office_name));
+      return twimlResponse(QUESTIONS.LANGUAGE_SELECT);
     }
 
     // ── Handle START_OFFICE_<id>  (legacy / fallback trigger) ────────────────
@@ -176,14 +200,34 @@ export async function POST(request: NextRequest): Promise<Response> {
 
     // ── Conversation state machine ─────────────────────────────────────────────
     if (session.current_step === 1) {
-      // ── Step 1: User picks flow (Office = 1, Policy = 2, Process = 3) ──
-      const choice = parseInt(messageText, 10);
+      // ── Step 1: Language Select ──
+      const isMarathi = messageText === "1" || messageText === "मराठी";
+      const isEnglish = messageText === "2" || messageText.toLowerCase() === "english";
+      
+      if (!isMarathi && !isEnglish) {
+        return twimlResponse(QUESTIONS.INVALID_OPTION);
+      }
+
+      session.language = isMarathi ? "mr" : "en";
+      session.current_step = 2; // Move to greeting
+      await session.save();
+
+      return twimlResponse(QUESTIONS.GREETING(session.office_name));
+    }
+    else if (session.current_step === 2) {
+      // ── Step 2: User picks flow (Office = 1, Policy = 2, Process = 3) ──
+      let choice = parseInt(messageText, 10);
+      
+      if (messageText === "कार्यालय अनुभव") choice = 1;
+      if (messageText === "धोरण सूचना") choice = 2;
+      if (messageText === "प्रक्रिया सुधारणा सूचना") choice = 3;
+
       if (![1, 2, 3].includes(choice)) {
         return twimlResponse(QUESTIONS.INVALID_OPTION);
       }
 
       session.answers.flow_choice = choice;
-      session.current_step = 2;
+      session.current_step = 3;
       await session.save();
 
       if (choice === 1) return twimlResponse(QUESTIONS.CAT1_Q1);
@@ -196,14 +240,14 @@ export async function POST(request: NextRequest): Promise<Response> {
       // ── Session already complete ────────────────────────────────────────────
       return twimlResponse(QUESTIONS.SESSION_COMPLETED);
     }
-    else if (session.current_step >= 2 && session.current_step <= 20) {
+    else if (session.current_step >= 3 && session.current_step <= 21) {
       // ── Audio Transcription Intercept ─────────────────────────────────────────
       if (numMedia > 0 && mediaUrl && mediaType?.startsWith("audio/")) {
         // Validate if audio is allowed for the CURRENT step the citizen is on
         const isAudioAllowed =
-          (session.answers.flow_choice === 1 && session.current_step === 11) || // Office Exp: Q10
-          (session.answers.flow_choice === 2 && session.current_step === 9) || // Policy Sugg: Mandatory Feedback
-          (session.answers.flow_choice === 3 && session.current_step === 3);   // Process Ref: Suggestion
+          (session.answers.flow_choice === 1 && session.current_step === 12) || // Office Exp: Q10
+          (session.answers.flow_choice === 2 && session.current_step === 10) || // Policy Sugg: Mandatory Feedback
+          (session.answers.flow_choice === 3 && session.current_step === 4);   // Process Ref: Suggestion
 
         if (!isAudioAllowed) {
           return twimlResponse("⚠️ Please reply with text/numbers for this step. Voice notes are only accepted for detailed descriptive feedback later in the flow.");
@@ -212,7 +256,7 @@ export async function POST(request: NextRequest): Promise<Response> {
         // Allowed -> transcribe async and block the flow until we get the text
         const transcribedText = await transcribeTwilioAudio(mediaUrl);
         if (transcribedText.startsWith("[Audio")) {
-          return twimlResponse("⚠️ " + transcribedText);
+          return twimlResponse(`⚠️ ${transcribedText}`);
         }
 
         // Override the empty messageText with the transcribed string
@@ -220,7 +264,7 @@ export async function POST(request: NextRequest): Promise<Response> {
       }
 
       // ── Hand off to specific flow handlers ──────────────────────────────────
-      let flowRes: { message: string; nextStep: number; completed: boolean };
+      let flowRes: { message: InteractiveMessage; nextStep: number; completed: boolean };
 
       switch (session.answers.flow_choice) {
         case 1:
@@ -243,16 +287,61 @@ export async function POST(request: NextRequest): Promise<Response> {
       await session.save();
 
       // Launch async AI sentiment extraction completely independent of the WhatsApp Twilio loop so timeout never hits
+      // We only do this here if completed was set to true directly by a flow handler somehow, 
+      // though now they all go to Step 21. Just in case of fallback:
       if (flowRes.completed) {
         processSessionWithAI(
           session._id.toString(),
           session.office_id,
           session.answers,
-          session.answers.flow_choice
+          session.answers.completed_flows.join(",") || String(session.answers.flow_choice)
         ).catch((err) => console.error("Async AI Error tracking", err));
       }
 
       return twimlResponse(flowRes.message);
+    }
+    else if (session.current_step === 22) {
+      // ── Step 22: Continue Menu (Multi-Flow Submission) ────────────────────
+      let choice = parseInt(messageText, 10);
+      
+      if (messageText === "पूर्ण करा" || choice === 4) choice = 0;
+      if (messageText === "कार्यालय अनुभव" || messageText === "कार्यालय अनुभव ✅") choice = 1;
+      if (messageText === "धोरण सूचना" || messageText === "धोरण सूचना ✅") choice = 2;
+      if (messageText === "प्रक्रिया सुधारणा" || messageText === "प्रक्रिया सुधारणा ✅") choice = 3;
+      
+      // Submit and Finish
+      if (choice === 0) {
+        session.completed = true;
+        await session.save();
+        
+        // Launch AI sentiment extraction for all combined flows
+        processSessionWithAI(
+          session._id.toString(),
+          session.office_id,
+          session.answers,
+          session.answers.completed_flows.join(",")
+        ).catch((err) => console.error("Async AI Error tracking", err));
+        
+        return twimlResponse("धन्यवाद.\nआपला अभिप्राय यशस्वीरित्या नोंदविण्यात आला आहे.\n\nआपल्या अभिप्रायामुळे शासकीय सेवा सुधारण्यास मदत होईल.");
+      }
+      
+      // Loop back to another flow
+      if ([1, 2, 3].includes(choice)) {
+        if (session.answers.completed_flows.includes(choice)) {
+          return twimlResponse(QUESTIONS.CONTINUE_MENU(session.answers.completed_flows));
+        }
+        
+        // Update flow choice and reset to Step 3
+        session.answers.flow_choice = choice;
+        session.current_step = 3;
+        await session.save();
+        
+        if (choice === 1) return twimlResponse(QUESTIONS.CAT1_Q1);
+        if (choice === 2) return twimlResponse(QUESTIONS.CAT2_FLOW_SELECT);
+        if (choice === 3) return twimlResponse(QUESTIONS.CAT3_Q1_CHANGE);
+      }
+      
+      return twimlResponse(QUESTIONS.INVALID_OPTION);
     }
     else {
       // ── Unknown state ────────────────────────────────────────────────────────
@@ -267,7 +356,7 @@ export async function POST(request: NextRequest): Promise<Response> {
 
     // Return a valid TwiML 200 response so Twilio doesn't retry
     const errResp = new twilio.twiml.MessagingResponse();
-    errResp.message(QUESTIONS.ERROR);
+    errResp.message(QUESTIONS.ERROR.text);
     return new Response(errResp.toString(), {
       status: 200,
       headers: { "Content-Type": "text/xml; charset=utf-8" },
