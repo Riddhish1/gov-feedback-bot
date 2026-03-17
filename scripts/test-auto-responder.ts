@@ -33,7 +33,7 @@ async function testAutoResponder() {
         mockSession._id.toString(),
         "TEST_AUTO_RESPONDER",
         mockSession.answers,
-        2
+        "2"
     );
 
     console.log("AI Result:");
