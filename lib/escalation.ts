@@ -1,7 +1,7 @@
 import Office from "@/models/Office";
 import Session from "@/models/Session";
 import Escalation from "@/models/Escalation";
-import { sendEscalationSMS } from "@/lib/sms-notify";
+import { sendEscalationEmail } from "@/lib/email-notify";
 
 /**
  * ESCALATION ENGINE
@@ -13,9 +13,7 @@ import { sendEscalationSMS } from "@/lib/sms-notify";
  * Level 3 → Div. Commissioner    : OMES below threshold for 5+ consecutive months
  * Level 4 → Guardian Secretary   : 5+ months + no corrective action uploaded
  *
- * This runs either:
- *  a) After every OMES recompute (post-webhook)
- *  b) Via POST /api/escalations/run (manual / cron trigger)
+ * Notifications are sent via SMTP email.
  */
 
 const OMES_THRESHOLD = 3.0; // Below this score triggers an escalation
@@ -169,34 +167,33 @@ export async function checkEscalationForOffice(officeId: string): Promise<void> 
             `(OMES: ${currentOMES}, ${consecutiveMonths} months below threshold)`
         );
 
-        // Resolve the correct recipient phone number based on escalation level.
-        // Reads directly from the office's stored contact fields.
+        // Resolve the correct recipient email based on escalation level.
+        // Reads from the office's stored contact email fields.
         const o = office as any;
-        const resolveRecipientPhone = (level: number): string | null => {
+        const resolveRecipientEmail = (level: number): string | null => {
             switch (level) {
-                case 1: return o.office_head_contact?.phone ?? null;
-                case 2: return o.collector_contact?.phone ?? null;
-                case 3: return o.divisional_commissioner_contact?.phone ?? null;
+                case 1: return o.office_head_contact?.email ?? null;
+                case 2: return o.collector_contact?.email ?? null;
+                case 3: return o.divisional_commissioner_contact?.email ?? null;
                 case 4:
-                    // guardian_secretary stored as a plain string (name only), so
-                    // fall back through hierarchy to the highest available contact
-                    return o.divisional_commissioner_contact?.phone
-                        ?? o.collector_contact?.phone
-                        ?? o.office_head_contact?.phone
+                    // Fall through hierarchy to the highest available contact
+                    return o.divisional_commissioner_contact?.email
+                        ?? o.collector_contact?.email
+                        ?? o.office_head_contact?.email
                         ?? null;
                 default: return null;
             }
         };
 
-        const recipientPhone = resolveRecipientPhone(requiredLevel)
-            ?? process.env.DEMO_NOTIFY_NUMBER   // last-resort fallback for demo/dev
+        const recipientEmail = resolveRecipientEmail(requiredLevel)
+            ?? process.env.DEMO_NOTIFY_EMAIL   // fallback for demo/dev
             ?? null;
 
-        console.log(`📞 [Escalation] L${requiredLevel} notification → resolved phone: ${recipientPhone ?? "NONE — no contact set on office and no DEMO_NOTIFY_NUMBER in .env"}`);
+        console.log(`📧 [Escalation] L${requiredLevel} notification → resolved email: ${recipientEmail ?? "NONE — no contact email set on office and no DEMO_NOTIFY_EMAIL in .env"}`);
 
-        if (recipientPhone) {
-            sendEscalationSMS(
-                recipientPhone,
+        if (recipientEmail) {
+            sendEscalationEmail(
+                recipientEmail,
                 {
                     office_name: o.office_name,
                     district: o.district,
@@ -209,11 +206,12 @@ export async function checkEscalationForOffice(officeId: string): Promise<void> 
                     office_id: officeId,
                 },
                 newEscalation._id.toString()
-            ).catch(err => console.error("[Escalation] SMS notification failed:", err));
+            ).catch(err => console.error("[Escalation] Email notification failed:", err));
         } else {
             console.warn(
-                `[Escalation] No contact phone found for L${requiredLevel} escalation on ${officeId}. ` +
-                "Set office_head_contact / collector_contact / divisional_commissioner_contact on the office record."
+                `[Escalation] No contact email found for L${requiredLevel} escalation on ${officeId}. ` +
+                "Set office_head_contact.email / collector_contact.email / divisional_commissioner_contact.email on the office record, " +
+                "or set DEMO_NOTIFY_EMAIL in .env."
             );
         }
 

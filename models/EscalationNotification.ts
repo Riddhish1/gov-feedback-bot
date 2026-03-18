@@ -6,7 +6,7 @@ export interface IEscalationNotification extends Document {
     office_name: string;
     level: number;
     recipient_label: string;       // e.g. "District Collector"
-    recipient_number: string;      // e.g. "+919876543210"
+    recipient_number: string;      // email address or phone number
     channel: "whatsapp" | "sms" | "email";
     message_body: string;
     twilio_sid: string | null;

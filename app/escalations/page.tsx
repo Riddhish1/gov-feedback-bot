@@ -772,8 +772,8 @@ export default function EscalationsPage() {
                             <Smartphone size={16} color={C.green} />
                         </div>
                         <div>
-                            <div style={{ fontSize: '18px', fontWeight: '660', color: C.text, letterSpacing: '-0.3px' }}>SMS Notification Log</div>
-                            <div style={{ fontSize: '13px', color: C.textSec }}>Live SMS alerts dispatched to officials via Twilio</div>
+                            <div style={{ fontSize: '18px', fontWeight: '660', color: C.text, letterSpacing: '-0.3px' }}>Email Notification Log</div>
+                            <div style={{ fontSize: '13px', color: C.textSec }}>Escalation alerts dispatched to officials via email</div>
                         </div>
                     </div>
                     <div style={{ display: 'flex', gap: '16px' }}>
@@ -839,14 +839,14 @@ export default function EscalationsPage() {
                                     </div>
                                 </div>
 
-                                {/* Recipient number */}
-                                <div style={{ fontSize: '13px', color: C.textSec, fontFamily: 'monospace' }}>
+                                {/* Recipient email */}
+                                <div style={{ fontSize: '13px', color: C.textSec }}>
                                     {n.recipient_number}
                                 </div>
 
-                                {/* Twilio SID */}
+                                {/* Message ID */}
                                 <div style={{ fontSize: '11px', color: C.textSec, fontFamily: 'monospace', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                                    {n.twilio_sid ? n.twilio_sid.slice(0, 14) + '…' : '—'}
+                                    {n.twilio_sid ? n.twilio_sid.slice(0, 20) + '…' : '—'}
                                 </div>
 
                                 {/* Timestamp */}

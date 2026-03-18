@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { LayoutDashboard, BrainCircuit, Building2, BookOpen, MessageSquareWarning, ShieldAlert } from 'lucide-react';
+import { LayoutDashboard, BrainCircuit, Building2, BookOpen, MessageSquareWarning, ShieldAlert, FileBarChart2 } from 'lucide-react';
 
 const navItems = [
   { path: '/', icon: LayoutDashboard, label: 'Overview' },
@@ -10,6 +10,7 @@ const navItems = [
   { path: '/add-office', icon: Building2, label: 'Add New Office' },
   { path: '/office-registry', icon: BookOpen, label: 'Full Office Registry' },
   { path: '/feedback', icon: MessageSquareWarning, label: 'Live AI Feed' },
+  { path: '/reports', icon: FileBarChart2, label: 'Monthly Reports' },
   { path: '/escalations', icon: ShieldAlert, label: 'Escalations' },
 ];
 

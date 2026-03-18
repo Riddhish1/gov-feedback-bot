@@ -10,7 +10,7 @@ export const dynamic = "force-dynamic";
  *
  * FOR DEMO PURPOSES ONLY.
  * Forces a specific office's OMES below the threshold and immediately
- * runs the escalation engine — raising an alert and firing a WhatsApp message.
+ * runs the escalation engine — raising an alert and sending an email notification.
  *
  * Body: { office_id: string, omes?: number (default 1.8), months?: number (default 4) }
  */
@@ -51,10 +51,10 @@ export async function POST(req: Request) {
 
         return NextResponse.json({
             success: true,
-            message: `Escalation triggered for '${(office as any).office_name}'. OMES forced to ${omes}. Check your WhatsApp and the Escalations page.`,
+            message: `Escalation triggered for '${(office as any).office_name}'. OMES forced to ${omes}. Check your email and the Escalations page.`,
             office_name: (office as any).office_name,
             forced_omes: omes,
-            check_whatsapp: true,
+            check_email: true,
         });
 
     } catch (err: any) {
