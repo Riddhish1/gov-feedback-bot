@@ -110,7 +110,7 @@ function KPICard({ label, value, micro, microPositive = true, sub, sparkData, sp
     <div
       style={{
         background: C.white,
-        border: '1px solid #000000',
+        border: `1px solid ${C.border}`,
         borderRadius: '14px',
         padding: '24px',
         flex: 1,
@@ -790,8 +790,8 @@ export function Overview() {
             display: 'grid',
             gridTemplateColumns: '2.5fr 1fr 1fr 1.1fr 2fr',
             padding: '12px 28px',
-            background: '#FAFBFC',
-            borderBottom: `1px solid ${C.border}`,
+            background: C.blue,
+            borderBottom: `1px solid ${C.blue}`,
           }}
         >
           {['Office', 'District', 'OMES', 'Rolling Trend', 'Primary Theme'].map((h) => (
@@ -800,7 +800,7 @@ export function Overview() {
               style={{
                 fontSize: '11px',
                 fontWeight: '600',
-                color: C.textSec,
+                color: '#FFFFFF',
                 textTransform: 'uppercase',
                 letterSpacing: '0.07em',
               }}
@@ -819,7 +819,7 @@ export function Overview() {
               display: 'grid',
               gridTemplateColumns: '2.5fr 1fr 1fr 1.1fr 2fr',
               padding: '16px 28px',
-              borderBottom: idx < offices.length - 1 ? '1px solid #000000' : 'none',
+              borderBottom: idx < offices.length - 1 ? `1px solid ${C.border}` : 'none',
               cursor: 'pointer',
               transition: 'background 0.12s ease',
               alignItems: 'center',
@@ -932,11 +932,7 @@ export function Overview() {
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
               <span
                 style={{
-                  padding: '4px 10px',
-                  background: C.bg,
-                  border: `1px solid ${C.border}`,
-                  borderRadius: '6px',
-                  fontSize: '12px',
+                  fontSize: '13px',
                   color: C.textSec,
                 }}
               >

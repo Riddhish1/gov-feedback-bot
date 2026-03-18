@@ -326,9 +326,10 @@ export function OfficeRegistry() {
     : 0;
 
   const underReviewCount = offices.filter((o) => !o.is_active).length;
+  const tableGridColumns = 'minmax(240px, 2.5fr) minmax(120px, 1fr) minmax(120px, 1fr) minmax(120px, 1fr) minmax(95px, 1fr) minmax(120px, 1fr) minmax(140px, 1fr)';
 
   return (
-    <div style={{ padding: '40px 48px', maxWidth: '1400px', margin: '0 auto' }}>
+    <div style={{ padding: '40px 48px', maxWidth: '1400px', margin: '0 auto', width: '100%', boxSizing: 'border-box' }}>
       {/* Header */}
       <div style={{ marginBottom: '32px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
@@ -375,7 +376,7 @@ export function OfficeRegistry() {
       </div>
 
       {/* Summary Strip */}
-      <div style={{ display: 'flex', gap: '12px', marginBottom: '24px' }}>
+      <div style={{ display: 'flex', gap: '12px', marginBottom: '24px', flexWrap: 'wrap' }}>
         {[
           { label: 'Total Offices', value: `${totalOffices}` },
           { label: 'Avg Visitors', value: `${avgVisitors}` },
@@ -404,7 +405,7 @@ export function OfficeRegistry() {
         style={{
           background: C.white, border: `1px solid ${C.border}`, borderRadius: '12px',
           padding: '16px 20px', marginBottom: '20px', boxShadow: C.shadow,
-          display: 'flex', gap: '12px', alignItems: 'center',
+          display: 'flex', gap: '12px', alignItems: 'center', flexWrap: 'wrap',
         }}
       >
         <div
@@ -460,17 +461,17 @@ export function OfficeRegistry() {
       <div
         style={{
           background: C.white, border: `2px solid ${C.border}`, borderRadius: '16px',
-          boxShadow: C.shadow, overflow: 'hidden',
+          boxShadow: C.shadow, overflowX: 'auto', overflowY: 'hidden',
         }}
       >
         {/* Table Header */}
         <div
           style={{
             display: 'grid',
-            gridTemplateColumns: '2.5fr 1fr 1fr 1fr 1fr 1fr 1fr',
+            gridTemplateColumns: tableGridColumns,
             padding: '12px 24px',
-            background: '#FAFBFC',
-            borderBottom: `1px solid ${C.border}`,
+            background: C.blue,
+            borderBottom: `1px solid ${C.blue}`,
           }}
         >
           {[
@@ -486,7 +487,7 @@ export function OfficeRegistry() {
               key={label}
               onClick={() => k && handleSort(k)}
               style={{
-                fontSize: '13px', fontWeight: '600', color: C.textSec,
+                fontSize: '13px', fontWeight: '600', color: '#FFFFFF',
                 textTransform: 'uppercase', letterSpacing: '0.07em',
                 cursor: k ? 'pointer' : 'default',
                 display: 'flex', alignItems: 'center', gap: '4px',
@@ -512,9 +513,9 @@ export function OfficeRegistry() {
               onClick={() => setSelectedOffice(office)}
               style={{
                 display: 'grid',
-                gridTemplateColumns: '2.5fr 1fr 1fr 1fr 1fr 1fr 1fr',
+                gridTemplateColumns: tableGridColumns,
                 padding: '14px 24px',
-                borderBottom: idx < offices.length - 1 ? '1px solid #000000' : 'none',
+                borderBottom: idx < offices.length - 1 ? `1px solid ${C.border}` : 'none',
                 alignItems: 'center',
                 transition: 'background 0.1s',
                 cursor: 'pointer',
@@ -529,12 +530,12 @@ export function OfficeRegistry() {
                 <span
                   style={{
                     padding: '2px 8px',
-                    background: office.is_active ? C.bg : '#FFFBEB',
-                    color: office.is_active ? C.textSec : '#92400E',
+                    background: office.is_active ? C.greenSoft : '#FFFBEB',
+                    color: office.is_active ? '#15803D' : '#92400E',
                     borderRadius: '20px',
                     fontSize: '12.5px',
                     fontWeight: '500',
-                    border: `1px solid ${office.is_active ? C.border : '#FDE68A'}`,
+                    border: `1px solid ${office.is_active ? '#A7F3D0' : '#FDE68A'}`,
                   }}
                 >
                   {office.is_active ? 'Active' : 'Inactive'}

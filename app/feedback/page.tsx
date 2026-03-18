@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from 'react';
-import { Search, Filter, Download, MessageSquare, AlertTriangle, Lightbulb, MapPin, Loader2, Sparkles, Languages, CheckCircle2 } from 'lucide-react';
+import { Search, Filter, Download, MessageSquare, AlertTriangle, Lightbulb, MapPin, Loader2, Sparkles, Languages, CheckCircle2, ChevronUp, ChevronRight, Clock } from 'lucide-react';
 
 const C = {
     blue: '#0B6CF5',
@@ -22,8 +22,211 @@ const C = {
     redBorder: '#FECACA',
     yellow: '#F59E0B',
     yellowSoft: '#FFFBEB',
-    yellowBorder: '#FDE68A'
+    yellowBorder: '#FDE68A',
+    amberSoft: '#FFFBEB',
+    amberBorder: '#FDE68A'
 };
+
+/* ─── Feedback Card Component ────────────────────────────── */
+function FeedbackCard({ session }: { session: any }) {
+    const [expanded, setExpanded] = useState(false);
+    const sColor = getSentimentColors(session.ai_analysis?.sentiment);
+    const rawText = getRawText(session.answers);
+    const dt = new Date(session.created_at);
+
+    // Helpers locally or passed down
+    const flowIcon = getFlowIcon(session.answers?.flow_choice);
+    const flowLabel = getFlowLabel(session.answers?.flow_choice);
+
+    return (
+        <div style={{
+            background: C.white,
+            borderRadius: '12px',
+            border: `1px solid ${C.border}`,
+            boxShadow: C.shadow,
+            overflow: 'hidden',
+            display: 'flex',
+            flexDirection: 'column'
+        }}>
+            {/* Main Key Info Row */}
+            <div style={{ display: 'flex' }}>
+                {/* Indicator Line */}
+                <div style={{ width: '5px', background: sColor.text, flexShrink: 0 }} />
+
+                <div style={{ flex: 1, padding: '16px 20px 16px 16px' }}>
+                    {/* Header: Office, Flow, Date | Right: Rating, Sentiment, Chevron */}
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '10px' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
+                            {/* Icon Box */}
+                            <div style={{
+                                width: '32px', height: '32px', borderRadius: '8px', background: C.blue,
+                                display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white'
+                            }}>
+                                {flowIcon}
+                            </div>
+                            
+                            <div>
+                                <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px' }}>
+                                    <h3 style={{ fontSize: '16px', fontWeight: '650', color: C.text, margin: 0 }}>
+                                        {session.office_name}
+                                    </h3>
+                                    <span style={{ fontSize: '13px', fontWeight: '600', color: C.blue }}>
+                                        {flowLabel}
+                                    </span>
+                                </div>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '12px', color: C.textSec, marginTop: '2px' }}>
+                                    <Clock size={11} />
+                                    {dt.toLocaleDateString()} at {dt.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                            {session.answers?.rating && (
+                                <div style={{
+                                    display: 'flex', alignItems: 'center', gap: '4px',
+                                    padding: '4px 8px', background: '#FEF3C7', border: '1px solid #FDE68A',
+                                    borderRadius: '6px', fontSize: '13px', fontWeight: '600', color: '#D97706'
+                                }}>
+                                    <span>★</span> {session.answers.rating}/5
+                                </div>
+                            )}
+
+                            <div style={{
+                                display: 'flex', alignItems: 'center', gap: '6px',
+                                background: sColor.bg, border: `1px solid ${sColor.border}`,
+                                padding: '4px 10px', borderRadius: '6px'
+                            }}>
+                                <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: sColor.text }} />
+                                <span style={{ fontSize: '13px', fontWeight: '600', color: sColor.text, textTransform: 'capitalize' }}>
+                                    {session.ai_analysis?.sentiment || 'Neutral'}
+                                    {session.ai_analysis?.confidence ? ` (${session.ai_analysis.confidence}%)` : ''}
+                                </span>
+                            </div>
+
+                            <button
+                                onClick={() => setExpanded(!expanded)}
+                                style={{
+                                    width: '28px', height: '28px', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                    background: C.bg, border: `1px solid ${C.border}`, borderRadius: '6px',
+                                    cursor: 'pointer', color: C.textSec
+                                }}
+                            >
+                                {expanded ? <ChevronUp size={16} /> : <ChevronRight size={16} />}
+                            </button>
+                        </div>
+                    </div>
+
+                    {/* Collapsed View: Raw Text Snippet & Tags */}
+                    <div style={{ background: C.bg, borderRadius: '8px', padding: '10px 14px', border: `1px solid ${C.borderLight}` }}>
+                        <div style={{ fontSize: '14px', color: C.text, lineHeight: 1.5 }}>
+                            <span style={{ fontWeight: '600', color: C.textSec, marginRight: '6px', fontSize: '12px', textTransform: 'uppercase' }}>RAW:</span>
+                            {expanded ? rawText : (rawText.length > 140 ? rawText.substring(0, 140) + '...' : rawText)}
+                        </div>
+                    </div>
+
+                    {/* Keyword Tags */}
+                    {session.ai_analysis?.keywords && session.ai_analysis.keywords.length > 0 && (
+                        <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', marginTop: '10px' }}>
+                            {session.ai_analysis.keywords.map((k: string, i: number) => (
+                                <span key={i} style={{
+                                    fontSize: '12px', color: C.textSec, background: C.white,
+                                    border: `1px solid ${C.border}`, padding: '2px 8px', borderRadius: '4px',
+                                    display: 'flex', alignItems: 'center', gap: '4px'
+                                }}>
+                                    # {k}
+                                </span>
+                            ))}
+                            {session.ai_analysis?.themes?.map((t: string, i: number) => (
+                                <span key={`t-${i}`} style={{
+                                    fontSize: '12px', color: C.blue, background: C.blueSoft,
+                                    border: `1px solid ${C.blueMid}40`, padding: '2px 8px', borderRadius: '10px',
+                                    fontWeight: '500'
+                                }}>
+                                    {t}
+                                </span>
+                            ))}
+                        </div>
+                    )}
+                </div>
+            </div>
+
+            {/* Expanded Content */}
+            {expanded && (
+                <div style={{
+                    padding: '0 20px 20px 20px',
+                    marginLeft: '5px', // offset for the left border
+                    animation: 'fadeIn 0.2s ease-in-out'
+                }}>
+                    <div style={{ height: '1px', background: C.border, marginBottom: '16px' }} />
+                    
+                    <div style={{ display: 'grid', gap: '16px' }}>
+                        
+                        {/* AI Translation */}
+                        {session.ai_analysis?.translated_text && (
+                            <div style={{ display: 'flex', gap: '12px' }}>
+                                <div style={{
+                                    width: '28px', height: '28px', borderRadius: '6px', background: '#F3E8FF',
+                                    display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0
+                                }}>
+                                    <Sparkles size={16} color="#9333EA" />
+                                </div>
+                                <div>
+                                    <div style={{ fontSize: '12px', fontWeight: '650', color: '#9333EA', textTransform: 'uppercase', marginBottom: '4px' }}>
+                                        AI Translation
+                                    </div>
+                                    <div style={{ fontSize: '14px', color: C.text, lineHeight: 1.5 }}>
+                                        {session.ai_analysis.translated_text}
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Actionable Recommendation */}
+                        {session.ai_analysis?.reform_recommendation && (
+                            <div style={{ 
+                                display: 'flex', gap: '12px', 
+                                background: '#ECFDF5', padding: '12px', borderRadius: '8px', 
+                                border: `1px solid ${C.greenBorder}`
+                            }}>
+                                <div style={{
+                                    width: '28px', height: '28px', borderRadius: '6px', background: C.green,
+                                    display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
+                                    color: 'white'
+                                }}>
+                                    <Lightbulb size={16} />
+                                </div>
+                                <div>
+                                    <div style={{ fontSize: '12px', fontWeight: '650', color: C.green, textTransform: 'uppercase', marginBottom: '4px' }}>
+                                        Actionable Recommendation
+                                    </div>
+                                    <div style={{ fontSize: '14px', color: '#064E3B', lineHeight: 1.5, fontWeight: '500' }}>
+                                        {session.ai_analysis.reform_recommendation}
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+                        
+                        {/* Extra Metadata Grid */}
+                         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '12px', marginTop: '8px' }}>
+                            {session.answers?.process_name && (
+                                <div style={{ fontSize: '13px' }}>
+                                    <span style={{ color: C.textSec }}>Process:</span> <span style={{ fontWeight: '500' }}>{session.answers.process_name}</span>
+                                </div>
+                            )}
+                            {session.answers?.scheme_name && (
+                                <div style={{ fontSize: '13px' }}>
+                                    <span style={{ color: C.textSec }}>Scheme:</span> <span style={{ fontWeight: '500' }}>{session.answers.scheme_name}</span>
+                                </div>
+                            )}
+                        </div>
+
+                    </div>
+                </div>
+            )}
+        </div>
+    );
+}
 
 export default function LiveFeedback() {
     const [sessions, setSessions] = useState<any[]>([]);
@@ -66,43 +269,14 @@ export default function LiveFeedback() {
     // Reset page when filters change
     useEffect(() => { setPage(1); }, [search, sentimentFilter, flowFilter]);
 
-    const getFlowIcon = (flowChoice: number) => {
-        switch (flowChoice) {
-            case 1: return <MapPin size={14} color={C.blue} />;
-            case 2: return <Lightbulb size={14} color={C.blue} />;
-            case 3: return <AlertTriangle size={14} color={C.blue} />;
-            default: return <MessageSquare size={14} color={C.blue} />;
-        }
-    };
-
-    const getFlowLabel = (flowChoice: number) => {
-        switch (flowChoice) {
-            case 1: return 'Office Experience';
-            case 2: return 'Policy Suggestion';
-            case 3: return 'Process Reform';
-            default: return 'External Feedback';
-        }
-    };
-
-    const getSentimentColors = (sentiment: string) => {
-        switch (sentiment?.toLowerCase()) {
-            case 'negative': return { bg: C.redSoft, border: C.redBorder, text: '#B91C1C' };
-            case 'positive': return { bg: C.greenSoft, border: C.greenBorder, text: '#15803D' };
-            case 'neutral': return { bg: C.yellowSoft, border: C.yellowBorder, text: '#D97706' };
-            default: return { bg: C.bg, border: C.border, text: C.textSec };
-        }
-    };
-
-    const getRawText = (answers: any) => {
-        if (!answers) return "No text provided.";
-        if (answers.feedback) return answers.feedback; // Office Experience
-        if (answers.scheme_suggestion) return answers.scheme_suggestion; // Process flow
-        if (answers.process_suggestion) return answers.process_suggestion; // Reform flow
-        return "Structured choices only (No free-text).";
-    };
-
+    // Helpers need to be available to FeedbackCard, so we define them outside or simply keep them here and pass them?
+    // Since FeedbackCard is defined inside the filescope but outside the component loop, we need to extract the helpers to file scope.
+    // I will do that in the "oldString" replacement block to ensure they are available.
+    
+    // ... (rest of the component structure)
+    
     return (
-        <div style={{ padding: '40px 48px', maxWidth: '1400px', margin: '0 auto' }}>
+        <div style={{ padding: '40px 48px', maxWidth: '1400px', margin: '0 auto', overflowX: 'auto' }}>
             {/* Header */}
             <div style={{ marginBottom: '32px' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
@@ -115,17 +289,20 @@ export default function LiveFeedback() {
                         <h1 style={{ fontSize: '28px', fontWeight: '680', color: C.text, letterSpacing: '-0.6px', marginBottom: '6px' }}>
                             Live Citizen Feedback
                         </h1>
-                        <p style={{ fontSize: '16px', color: C.textSec }}>
+                        <p style={{ fontSize: '14px', color: C.textSec }}>
                             Real-time WhatsApp submissions enriched with NLP Sentiment & Suggestions
                         </p>
                     </div>
-                    <div style={{ display: 'flex', gap: '10px' }}>
+                    {/* ... Export Button ... */}
+                     <div style={{ display: 'flex', gap: '10px' }}>
                         <button
                             style={{
                                 display: 'flex', alignItems: 'center', gap: '7px',
-                                padding: '9px 16px', background: C.white, border: `1px solid ${C.border}`,
-                                borderRadius: '9px', fontSize: '15px', color: C.textSec, cursor: 'pointer',
-                                fontFamily: 'inherit', boxShadow: C.shadow,
+                                padding: '9px 16px', background: C.blue, border: 'none',
+                                borderRadius: '9px', fontSize: '14px', color: '#FFFFFF',
+                                fontWeight: '520', cursor: 'pointer',
+                                fontFamily: 'inherit',
+                                boxShadow: '0 2px 8px rgba(11,108,245,0.25)',
                             }}
                         >
                             <Download size={13} />
@@ -135,20 +312,19 @@ export default function LiveFeedback() {
                 </div>
             </div>
 
-
-
             {/* Constraints Tool Bar */}
             <div
                 style={{
                     background: C.white, border: `2px solid ${C.border}`, borderRadius: '12px',
-                    padding: '16px 20px', marginBottom: '20px', boxShadow: C.shadow,
+                    padding: '12px 16px', marginBottom: '20px', boxShadow: C.shadow,
                     display: 'flex', gap: '12px', alignItems: 'center',
                 }}
             >
-                <div
+               {/* ... Filters (search, select) with reduced padding/font ... */}
+               <div
                     style={{
                         flex: 1, display: 'flex', alignItems: 'center', gap: '10px',
-                        background: C.bg, border: `1px solid ${C.border}`, borderRadius: '9px', padding: '9px 14px',
+                        background: C.bg, border: `1px solid ${C.border}`, borderRadius: '9px', padding: '8px 12px',
                     }}
                 >
                     <Search size={14} color={C.textSec} />
@@ -158,7 +334,7 @@ export default function LiveFeedback() {
                         placeholder="Search raw feedback, office, or keywords…"
                         style={{
                             flex: 1, border: 'none', outline: 'none', background: 'transparent',
-                            fontSize: '15.5px', color: C.text, fontFamily: 'inherit',
+                            fontSize: '14px', color: C.text, fontFamily: 'inherit',
                         }}
                     />
                 </div>
@@ -171,8 +347,8 @@ export default function LiveFeedback() {
                     value={sentimentFilter}
                     onChange={(e) => setSentimentFilter(e.target.value)}
                     style={{
-                        padding: '9px 12px', background: C.bg, border: `1px solid ${C.border}`,
-                        borderRadius: '9px', fontSize: '15px', color: sentimentFilter ? C.text : C.textSec,
+                        padding: '8px 12px', background: C.bg, border: `1px solid ${C.border}`,
+                        borderRadius: '9px', fontSize: '14px', color: sentimentFilter ? C.text : C.textSec,
                         cursor: 'pointer', fontFamily: 'inherit', outline: 'none', minWidth: '140px',
                     }}
                 >
@@ -186,8 +362,8 @@ export default function LiveFeedback() {
                     value={flowFilter}
                     onChange={(e) => setFlowFilter(e.target.value)}
                     style={{
-                        padding: '9px 12px', background: C.bg, border: `1px solid ${C.border}`,
-                        borderRadius: '9px', fontSize: '15px', color: flowFilter ? C.text : C.textSec,
+                        padding: '8px 12px', background: C.bg, border: `1px solid ${C.border}`,
+                        borderRadius: '9px', fontSize: '14px', color: flowFilter ? C.text : C.textSec,
                         cursor: 'pointer', fontFamily: 'inherit', outline: 'none', minWidth: '160px',
                     }}
                 >
@@ -199,174 +375,68 @@ export default function LiveFeedback() {
             </div>
 
             {/* Real-Time Cards List */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                 {isLoading ? (
                     <div style={{ padding: '60px', textAlign: 'center', color: C.textSec, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px', background: C.white, border: `1px solid ${C.border}`, borderRadius: '12px' }}>
                         <Loader2 size={24} className="animate-spin" color={C.blue} />
-                        <span style={{ fontSize: '16px' }}>Parsing latest submissions...</span>
+                        <span style={{ fontSize: '14px' }}>Parsing latest submissions...</span>
                     </div>
                 ) : sessions.length > 0 ? (
-                    sessions.map((session: any, idx) => {
-                        const sColor = getSentimentColors(session.ai_analysis?.sentiment);
-                        const rawText = getRawText(session.answers);
-                        const dt = new Date(session.created_at);
-
-                        return (
-                            <div key={session._id} style={{ background: C.white, borderRadius: '14px', border: `1px solid #000000`, boxShadow: C.shadow, overflow: 'hidden', display: 'flex' }}>
-                                {/* Color stripe anchor */}
-                                <div style={{ width: '6px', background: sColor.border }} />
-
-                                <div style={{ padding: '24px', flex: 1 }}>
-                                    {/* Card Head */}
-                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '16px' }}>
-                                        <div>
-                                            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '6px' }}>
-                                                <span style={{
-                                                    display: 'inline-flex', alignItems: 'center', gap: '6px',
-                                                    background: C.blueSoft, color: C.blue, padding: '4px 10px',
-                                                    borderRadius: '20px', fontSize: '13px', fontWeight: '600'
-                                                }}>
-                                                    {getFlowIcon(session.answers?.flow_choice)}
-                                                    {getFlowLabel(session.answers?.flow_choice)}
-                                                </span>
-                                                <span style={{ fontSize: '14px', color: C.textSec }}>• {dt.toLocaleDateString()} at {dt.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
-                                            </div>
-                                            <h2 style={{ fontSize: '20px', fontWeight: '640', color: C.text, letterSpacing: '-0.3px', margin: 0 }}>
-                                                {session.office_name}
-                                            </h2>
-                                        </div>
-                                        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '6px' }}>
-                                            <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', background: sColor.bg, border: `1px solid ${sColor.border}`, padding: '4px 12px', borderRadius: '6px' }}>
-                                                <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: sColor.text }} />
-                                                <span style={{ fontSize: '15px', fontWeight: '600', color: sColor.text, textTransform: 'capitalize' }}>{session.ai_analysis?.sentiment || 'Neutral'}</span>
-                                            </div>
-                                            {session.ai_analysis?.confidence && (
-                                                <span style={{ fontSize: '13px', color: C.textSec }}>{session.ai_analysis.confidence}% Confidence</span>
-                                            )}
-                                        </div>
-                                    </div>
-
-                                    {/* Split Body Content */}
-                                    <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr', gap: '32px' }}>
-                                        {/* Left side: Original details */}
-                                        <div>
-                                            <div style={{ marginBottom: '12px' }}>
-                                                <span style={{ fontSize: '13px', color: C.textSec, fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
-                                                    Raw Submission (WhatsApp)
-                                                </span>
-                                                <p style={{ marginTop: '6px', fontSize: '16.5px', color: C.text, lineHeight: 1.5, background: C.bg, padding: '12px 14px', borderRadius: '8px', border: `1px solid ${C.borderLight}` }}>
-                                                    "{rawText}"
-                                                </p>
-                                            </div>
-
-                                            {/* Showing structured mapping from answers object briefly */}
-                                            <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap' }}>
-                                                {session.answers?.rating && (
-                                                    <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                                                        <span style={{ fontSize: '13px', color: C.textSec }}>User Rating:</span>
-                                                        <span style={{ fontSize: '14px', fontWeight: '600', background: C.yellowSoft, color: '#D97706', padding: '2px 8px', borderRadius: '4px' }}>{session.answers.rating} / 5</span>
-                                                    </div>
-                                                )}
-                                                {session.answers?.process_name && (
-                                                    <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                                                        <span style={{ fontSize: '13px', color: C.textSec }}>Target Process:</span>
-                                                        <span style={{ fontSize: '14px', fontWeight: '500', color: C.text }}>{session.answers.process_name}</span>
-                                                    </div>
-                                                )}
-                                            </div>
-                                        </div>
-
-                                        {/* Right Side: AI Analytics block */}
-                                        <div style={{ background: '#F8FAFC', padding: '20px', borderRadius: '10px', border: `1px solid #000000`, display: 'flex', flexDirection: 'column', gap: '14px' }}>
-                                            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '4px' }}>
-                                                <Sparkles size={14} color={C.blue} />
-                                                <span style={{ fontSize: '14px', fontWeight: '640', color: C.blue, textTransform: 'uppercase', letterSpacing: '0.05em' }}>AI Analytics Layer</span>
-                                            </div>
-
-                                            {session.ai_analysis?.translated_text && (
-                                                <div>
-                                                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '6px' }}>
-                                                        <Languages size={12} color={C.textSec} />
-                                                        <span style={{ fontSize: '13px', color: C.textSec, fontWeight: '500' }}>ENGLISH TRANSLATION</span>
-                                                    </div>
-                                                    <p style={{ fontSize: '15.5px', color: C.text, lineHeight: 1.4, margin: 0 }}>
-                                                        {session.ai_analysis.translated_text}
-                                                    </p>
-                                                </div>
-                                            )}
-
-                                            <div>
-                                                <div style={{ fontSize: '13px', color: C.textSec, fontWeight: '500', marginBottom: '6px' }}>EXTRACTED THEMES</div>
-                                                <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
-                                                    {session.ai_analysis?.themes?.map((t: string) => (
-                                                        <span key={t} style={{ fontSize: '13px', background: C.white, border: `1px solid ${C.border}`, padding: '4px 10px', borderRadius: '6px', color: C.text }}>
-                                                            {t}
-                                                        </span>
-                                                    ))}
-                                                    {session.ai_analysis?.keywords?.map((k: string) => (
-                                                        <span key={k} style={{ fontSize: '13px', background: C.bg, border: `1px solid ${C.borderLight}`, padding: '4px 10px', borderRadius: '6px', color: C.textSec }}>
-                                                            #{k}
-                                                        </span>
-                                                    ))}
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    {/* Actionable Reform Banner */}
-                                    {session.ai_analysis?.reform_recommendation && (
-                                        <div style={{ marginTop: '20px', background: '#F0FDF4', border: '1px solid #16A34A', borderRadius: '8px', padding: '12px 16px', display: 'flex', alignItems: 'flex-start', gap: '12px' }}>
-                                            <CheckCircle2 size={16} color="#16A34A" style={{ marginTop: '2px' }} />
-                                            <div>
-                                                <div style={{ fontSize: '13px', fontWeight: '700', color: '#15803D', textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: '4px' }}>Actionable Reform Recommendation</div>
-                                                <div style={{ fontSize: '16px', color: '#166534', fontWeight: '500' }}>
-                                                    {session.ai_analysis.reform_recommendation}
-                                                </div>
-                                            </div>
-                                        </div>
-                                    )}
-
-                                </div>
-                            </div>
-                        )
-                    })
+                    sessions.map((session: any) => (
+                        <FeedbackCard key={session._id} session={session} />
+                    ))
                 ) : (
-                    <div style={{ padding: '48px', textAlign: 'center', color: C.textSec, fontSize: '16px', background: C.white, border: `1px solid ${C.border}`, borderRadius: '12px' }}>
-                        No feedback instances match your current filters.
-                    </div>
-                )
-                }
-            </div>
-
-            {/* Footer Paginator */}
-            <div
-                style={{
-                    padding: '24px 0',
-                    display: 'flex', alignItems: 'center', justifyContent: 'center'
-                }}
-            >
-                {totalPages > 1 && (
-                    <div style={{ display: 'flex', gap: '6px' }}>
-                        {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
-                            <button
-                                key={p}
-                                onClick={() => setPage(p)}
-                                style={{
-                                    width: '32px', height: '32px', borderRadius: '7px',
-                                    border: `1px solid ${p === page ? C.blue : C.border}`,
-                                    background: p === page ? C.blue : C.white,
-                                    color: p === page ? 'white' : C.textSec,
-                                    fontSize: '15px', cursor: 'pointer', fontFamily: 'inherit',
-                                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                    transition: 'all 0.15s'
-                                }}
-                            >
-                                {p}
-                            </button>
-                        ))}
-                    </div>
+                    <div style={{ padding: '40px', textAlign: 'center', color: C.textSec }}>No feedback found.</div>
                 )}
             </div>
+            
+             {/* Pagination (Simplified) */}
+             {totalPages > 1 && (
+                <div style={{ display: 'flex', justifyContent: 'center', gap: '10px', marginTop: '24px' }}>
+                    <button disabled={page === 1} onClick={() => setPage(p => p - 1)} style={{ padding: '8px 16px', cursor: 'pointer', opacity: page === 1 ? 0.5 : 1 }}>Prev</button>
+                    <span style={{ padding: '8px' }}>Page {page} of {totalPages}</span>
+                    <button disabled={page === totalPages} onClick={() => setPage(p => p + 1)} style={{ padding: '8px 16px', cursor: 'pointer', opacity: page === totalPages ? 0.5 : 1 }}>Next</button>
+                </div>
+            )}
         </div>
-    )
+    );
 }
+
+// Helpers moved to file scope
+const getFlowIcon = (flowChoice: number) => {
+    switch (flowChoice) {
+        case 1: return <MapPin size={16} color="white" />; // Changed color for the blue box
+        case 2: return <Lightbulb size={16} color="white" />;
+        case 3: return <AlertTriangle size={16} color="white" />;
+        default: return <MessageSquare size={16} color="white" />;
+    }
+};
+
+const getFlowLabel = (flowChoice: number) => {
+    switch (flowChoice) {
+        case 1: return 'Office Experience';
+        case 2: return 'Policy Suggestion';
+        case 3: return 'Process Reform';
+        default: return 'External Feedback';
+    }
+};
+
+const getSentimentColors = (sentiment: string) => {
+    switch (sentiment?.toLowerCase()) {
+        case 'negative': return { bg: C.redSoft, border: C.redBorder, text: '#B91C1C' };
+        case 'positive': return { bg: C.greenSoft, border: C.greenBorder, text: '#15803D' };
+        case 'neutral': return { bg: C.amberSoft, border: C.amberBorder, text: '#D97706' }; // Changed to amber for better contrast
+        default: return { bg: C.bg, border: C.border, text: C.textSec };
+    }
+};
+
+const getRawText = (answers: any) => {
+    if (!answers) return "No text provided.";
+    if (answers.feedback) return answers.feedback; 
+    if (answers.scheme_suggestion) return answers.scheme_suggestion;
+    if (answers.process_suggestion) return answers.process_suggestion;
+    return "Structured choices only (No free-text).";
+};
+
+
+

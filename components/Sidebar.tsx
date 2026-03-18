@@ -2,16 +2,16 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { LayoutDashboard, BrainCircuit, Building2, BookOpen, MessageSquareWarning, ShieldAlert, FileBarChart2 } from 'lucide-react';
+import { LayoutGrid, Brain, Building2, Plus, Radio, AlertTriangle  ,FileBarChart2} from 'lucide-react';
 
 const navItems = [
-  { path: '/', icon: LayoutDashboard, label: 'Overview' },
-  { path: '/dashboard/regional', icon: BrainCircuit, label: 'Regional Intelligence' },
-  { path: '/add-office', icon: Building2, label: 'Add New Office' },
-  { path: '/office-registry', icon: BookOpen, label: 'Full Office Registry' },
-  { path: '/feedback', icon: MessageSquareWarning, label: 'Live AI Feed' },
+  { path: '/', icon: LayoutGrid, label: 'Overview' },
+  { path: '/dashboard/regional', icon: Brain, label: 'Regional Intelligence' },
+  { path: '/add-office', icon: Plus, label: 'Add New' },
+  { path: '/office-registry', icon: Building2, label: 'Full Office Registry' },
+  { path: '/feedback', icon: Radio, label: 'Live AI Feed' },
+  { path: '/escalations', icon: AlertTriangle, label: 'Escalations' },
   { path: '/reports', icon: FileBarChart2, label: 'Monthly Reports' },
-  { path: '/escalations', icon: ShieldAlert, label: 'Escalations' },
 ];
 
 export function Sidebar() {
@@ -69,9 +69,6 @@ export function Sidebar() {
             </div>
           </div>
         </div>
-
-        {/* WhatsApp indicator */}
-
       </div>
 
       {/* Context Badge */}
@@ -83,21 +80,17 @@ export function Sidebar() {
             letterSpacing: '0.09em',
             color: '#9BA5B0',
             fontWeight: '600',
-            marginBottom: '8px',
+            marginBottom: '6px',
           }}
         >
           ACCESS LEVEL
         </div>
         <div
           style={{
-            padding: '9px 12px',
-            background: '#EAF2FF',
-            borderRadius: '8px',
-            fontSize: '12.5px',
+            fontSize: '13px',
             color: '#0B6CF5',
-            fontWeight: '500',
+            fontWeight: '600',
             letterSpacing: '-0.1px',
-            border: '1px solid #BFDBFE',
           }}
         >
           Maharashtra — State Level

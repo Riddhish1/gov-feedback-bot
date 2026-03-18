@@ -31,7 +31,7 @@ export default function RootLayout({
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         <div style={{ display: 'flex', minHeight: '100vh' }}>
           <Sidebar />
-          <main style={{ flex: 1 }}>{children}</main>
+          <main style={{ flex: 1, minWidth: 0 }}>{children}</main>
         </div>
       </body>
     </html>
