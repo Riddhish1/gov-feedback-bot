@@ -63,7 +63,7 @@ const REPORT_TYPES = [
   { id: 1, label: "5★ Last Month",     shortLabel: "5★ × 1",  icon: Star,           color: C.gold,   bg: C.goldSoft,   border: "#FDE68A", desc: "Offices with ≥4.5 avg rating" },
   { id: 2, label: "5★ × 2 Months",     shortLabel: "5★ × 2",  icon: Award,          color: C.green,  bg: C.greenSoft,  border: C.greenMid, desc: "Consistent 2-month streak" },
   { id: 3, label: "5★ × 3 Months",     shortLabel: "5★ × 3",  icon: Sparkles,       color: C.blue,   bg: C.blueSoft,   border: C.blueMid, desc: "Outstanding 3-month streak" },
-  { id: 4, label: "<3★ Sustained",     shortLabel: "<3★",     icon: AlertTriangle,  color: C.red,    bg: C.redSoft,    border: C.redMid, desc: "Below 3★ for 3–6 months" },
+  { id: 4, label: "<3★ Sustained 3-6 Months",     shortLabel: "<3★",     icon: AlertTriangle,  color: C.red,    bg: C.redSoft,    border: C.redMid, desc: "Below 3★ for 3–6 months" },
   { id: 5, label: "3★→<3★ Declining",  shortLabel: "Decline", icon: ArrowDownRight, color: C.amber,  bg: C.amberSoft,  border: C.amberMid, desc: "Dropped from ≥3 to <3" },
   { id: 6, label: "Master Report",     shortLabel: "All",     icon: List,           color: C.purple, bg: C.purpleSoft, border: "#DDD6FE", desc: "All offices — full searchable view" },
 ];

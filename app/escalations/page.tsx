@@ -45,7 +45,7 @@ const LEVEL_CONFIG = {
         icon: AlertTriangle,
     },
     2: {
-        label: 'Collector Escalation',
+        label: 'Taluka Head Escalation',
         short: 'L2',
         color: C.orange,
         bg: C.orangeSoft,
@@ -54,7 +54,7 @@ const LEVEL_CONFIG = {
         icon: ShieldAlert,
     },
     3: {
-        label: 'Commissioner Escalation',
+        label: 'District Head Escalation',
         short: 'L3',
         color: C.red,
         bg: C.redSoft,
@@ -62,15 +62,16 @@ const LEVEL_CONFIG = {
         description: '5 consecutive months below threshold',
         icon: ShieldAlert,
     },
-    4: {
-        label: 'Guardian Secretary',
-        short: 'L4',
-        color: '#7C3AED',
-        bg: '#F5F3FF',
-        border: '#DDD6FE',
-        description: 'Persistent decline, no corrective action',
-        icon: ShieldAlert,
-    },
+};
+
+const DEFAULT_LEVEL = {
+    label: 'Escalation',
+    short: 'L?',
+    color: C.red,
+    bg: C.redSoft,
+    border: C.redBorder,
+    description: 'Threshold breach',
+    icon: ShieldAlert,
 };
 
 /* ─── Corrective Action Modal ────────────────────────────── */
@@ -109,7 +110,7 @@ function ActionModal({
         }
     };
 
-    const lc = LEVEL_CONFIG[escalation.level as keyof typeof LEVEL_CONFIG];
+    const lc = LEVEL_CONFIG[escalation.level as keyof typeof LEVEL_CONFIG] || DEFAULT_LEVEL;
 
     return (
         <div
@@ -219,7 +220,7 @@ function EscalationCard({
     onAction: (esc: any) => void;
 }) {
     const [expanded, setExpanded] = useState(false);
-    const lc = LEVEL_CONFIG[esc.level as keyof typeof LEVEL_CONFIG];
+    const lc = LEVEL_CONFIG[esc.level as keyof typeof LEVEL_CONFIG] || DEFAULT_LEVEL;
     const Icon = lc.icon;
     const triggeredDate = new Date(esc.triggered_at);
 
@@ -476,15 +477,7 @@ export default function EscalationsPage() {
             icon: AlertTriangle,
         },
         {
-            label: 'L4 — Guardian Secretary',
-            value: summary.l4Count,
-            color: '#7C3AED',
-            bg: '#F5F3FF',
-            border: '#DDD6FE',
-            icon: ShieldAlert,
-        },
-        {
-            label: 'L3 — Commissioner',
+            label: 'L3 — District Head',
             value: summary.l3Count,
             color: C.red,
             bg: C.redSoft,
@@ -517,7 +510,7 @@ export default function EscalationsPage() {
                             Escalation Control Centre
                         </h1>
                         <p style={{ fontSize: '16px', color: C.textSec }}>
-                            Pattern-triggered, 4-level governance escalation system · Auto-resolved on OMES recovery
+                            Pattern-triggered, 3-level governance escalation system · Auto-resolved on OMES recovery
                         </p>
                     </div>
                     <button
@@ -684,9 +677,8 @@ export default function EscalationsPage() {
                 >
                     <option value="">All Levels</option>
                     <option value="1">L1 — Office Head</option>
-                    <option value="2">L2 — Collector</option>
-                    <option value="3">L3 — Commissioner</option>
-                    <option value="4">L4 — Guardian Secretary</option>
+                    <option value="2">L2 — Taluka Head</option>
+                    <option value="3">L3 — District Head</option>
                 </select>
 
                 <span style={{ fontSize: '14px', color: C.textSec, marginLeft: 'auto' }}>
