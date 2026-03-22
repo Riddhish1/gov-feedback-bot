@@ -30,32 +30,41 @@ interface MonthlyOMES {
  * Returns an array ordered oldest → newest.
  */
 async function computeMonthlyHistory(officeId: string): Promise<MonthlyOMES[]> {
-    const history: MonthlyOMES[] = [];
     const now = new Date();
+    const windowStart = new Date(now.getFullYear(), now.getMonth() - (MONTHS_TO_CHECK - 1), 1);
+    const windowEnd = new Date(now.getFullYear(), now.getMonth() + 1, 1);
 
-    for (let i = MONTHS_TO_CHECK - 1; i >= 0; i--) {
-        const start = new Date(now.getFullYear(), now.getMonth() - i, 1);
-        const end = new Date(now.getFullYear(), now.getMonth() - i + 1, 1);
-        const monthKey = `${start.getFullYear()}-${String(start.getMonth() + 1).padStart(2, "0")}`;
+    const rows = await Session.aggregate([
+        {
+            $match: {
+                office_id: officeId,
+                completed: true,
+                "answers.flow_choice": 1,
+                "answers.office_rating": { $ne: null },
+                created_at: { $gte: windowStart, $lt: windowEnd },
+            },
+        },
+        {
+            $project: {
+                month: { $dateToString: { format: "%Y-%m", date: "$created_at" } },
+                rating: "$answers.office_rating",
+            },
+        },
+        {
+            $group: {
+                _id: "$month",
+                omes: { $avg: "$rating" },
+                sessionCount: { $sum: 1 },
+            },
+        },
+        { $sort: { _id: 1 } },
+    ]);
 
-        const sessions = await Session.find({
-            office_id: officeId,
-            completed: true,
-            "answers.flow_choice": 1,
-            "answers.office_rating": { $ne: null },
-            created_at: { $gte: start, $lt: end },
-        }).lean();
-
-        if (sessions.length > 0) {
-            const avg =
-                sessions.reduce((s, r) => s + (r.answers.office_rating || 0), 0) /
-                sessions.length;
-            history.push({ month: monthKey, omes: Number(avg.toFixed(2)), sessionCount: sessions.length });
-        }
-        // If no sessions that month, we skip it (don't penalise empty months)
-    }
-
-    return history;
+    return rows.map((row: any) => ({
+        month: row._id,
+        omes: Number((row.omes ?? 0).toFixed(2)),
+        sessionCount: row.sessionCount ?? 0,
+    }));
 }
 
 /**
@@ -92,9 +101,9 @@ function determineLevel(consecutiveMonths: number, hasNoAction: boolean, maxLeve
  * Core function — run escalation check for a single office.
  * Called after every OMES recompute in ai.ts.
  */
-export async function checkEscalationForOffice(officeId: string): Promise<void> {
+export async function checkEscalationForOffice(officeId: string, officeOverride?: any): Promise<void> {
     try {
-        const office = await Office.findOne({ office_id: officeId }).lean();
+        const office = officeOverride ?? await Office.findOne({ office_id: officeId }).lean();
         if (!office) return;
 
         const currentOMES: number = (office as any).metadata?.omes ?? 0;
@@ -192,21 +201,25 @@ export async function checkEscalationForOffice(officeId: string): Promise<void> 
         console.log(`📧 [Escalation] L${requiredLevel} notification → resolved email: ${recipientEmail ?? "NONE — no contact email set on office and no DEMO_NOTIFY_EMAIL in .env"}`);
 
         if (recipientEmail) {
-            sendEscalationEmail(
-                recipientEmail,
-                {
-                    office_name: o.office_name,
-                    district: o.district,
-                    division: o.division ?? "",
-                    department: o.department ?? "",
-                    level: requiredLevel,
-                    omes_at_trigger: currentOMES,
-                    consecutive_months_below: consecutiveMonths,
-                    threshold_used: OMES_THRESHOLD,
-                    office_id: officeId,
-                },
-                newEscalation._id.toString()
-            ).catch(err => console.error("[Escalation] Email notification failed:", err));
+            try {
+                await sendEscalationEmail(
+                    recipientEmail,
+                    {
+                        office_name: o.office_name,
+                        district: o.district,
+                        division: o.division ?? "",
+                        department: o.department ?? "",
+                        level: requiredLevel,
+                        omes_at_trigger: currentOMES,
+                        consecutive_months_below: consecutiveMonths,
+                        threshold_used: OMES_THRESHOLD,
+                        office_id: officeId,
+                    },
+                    newEscalation._id.toString()
+                );
+            } catch (err) {
+                console.error("[Escalation] Email notification failed:", err);
+            }
         } else {
             console.warn(
                 `[Escalation] No contact email found for L${requiredLevel} escalation on ${officeId}. ` +
@@ -225,12 +238,16 @@ export async function checkEscalationForOffice(officeId: string): Promise<void> 
  * Used by POST /api/escalations/run
  */
 export async function runEscalationSweep(): Promise<{ checked: number; raised: number }> {
-    const offices = await Office.find({ is_active: true }).select("office_id").lean();
+    const offices = await Office.find({ is_active: true })
+        .select("office_id office_name district division department metadata.omes office_head_contact collector_contact divisional_commissioner_contact")
+        .lean();
     let raised = 0;
     const before = await Escalation.countDocuments({ status: "open" });
 
-    for (const o of offices) {
-        await checkEscalationForOffice((o as any).office_id);
+    const SWEEP_CONCURRENCY = 8;
+    for (let i = 0; i < offices.length; i += SWEEP_CONCURRENCY) {
+        const batch = offices.slice(i, i + SWEEP_CONCURRENCY);
+        await Promise.all(batch.map((o: any) => checkEscalationForOffice(o.office_id, o)));
     }
 
     const after = await Escalation.countDocuments({ status: "open" });
