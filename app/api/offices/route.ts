@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { connectDB } from "@/lib/db";
 import Office from "@/models/Office";
+import { requireAuth } from "@/lib/auth";
 
 /**
  * GET /api/offices
@@ -9,6 +10,8 @@ import Office from "@/models/Office";
  */
 export async function GET(req: Request) {
   try {
+    await requireAuth();
+    
     const { searchParams } = new URL(req.url);
     const page = parseInt(searchParams.get('page') || '1');
     const limit = parseInt(searchParams.get('limit') || '15');
@@ -30,7 +33,6 @@ export async function GET(req: Request) {
     if (division) query.division = division;
     if (dept) query.department = dept;
 
-    // Map frontend sort keys to DB schema fields
     const dbSortKey = sortKey === 'name' ? 'office_name' : sortKey === 'dept' ? 'department' : sortKey === 'expected_visitors' ? 'expected_visitors' : sortKey === 'omes' ? 'office_id' : sortKey;
 
     const total = await Office.countDocuments(query);
@@ -54,6 +56,9 @@ export async function GET(req: Request) {
     });
   } catch (error) {
     console.error("[GET /api/offices]", error);
+    if (error instanceof Error && error.message === "Unauthorized") {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
     return NextResponse.json(
       { error: "Failed to fetch offices" },
       { status: 500 }
@@ -68,6 +73,8 @@ export async function GET(req: Request) {
  */
 export async function POST(req: Request) {
   try {
+    const authUser = await requireAuth("ADMIN");
+    
     await connectDB();
     const body = await req.json();
 
@@ -84,7 +91,7 @@ export async function POST(req: Request) {
       office_type: body.officeType,
       district: body.district,
       division: body.division,
-      state: "Maharashtra", // Hardcoded for this use-case per design
+      state: "Maharashtra",
       digipin: body.digipin,
       treasury_code: body.treasuryCode,
       services: body.services || [],
@@ -127,6 +134,12 @@ export async function POST(req: Request) {
     );
   } catch (error) {
     console.error("[POST /api/offices]", error);
+    if (error instanceof Error && error.message === "Unauthorized") {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+    if (error instanceof Error && error.message === "Forbidden") {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
     return NextResponse.json(
       { error: "Failed to create office" },
       { status: 500 }
